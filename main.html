@@ -12,6 +12,8 @@
 
         <script type="text/javascript" src="gl-matrix.js"></script>
 		<script type="text/javascript" src="geometry.js"></script>
+		<script type="text/javascript" src="conjunto.js"></script>
+		<script type="text/javascript" src="Mesh.js"></script>
         <!--
         Vertex shader
 
@@ -206,6 +208,17 @@
                 my_grid.createGrid();
                 my_grid.createIndexBuffer();
                 my_grid.setupWebGLBuffers();
+				my_mesh = new Mesh(my_grid);
+				
+				/*my_grid2 = new Geometry(9, 10, GridType.CILINDER);
+                my_grid2.createGrid();
+                my_grid2.createIndexBuffer();
+                my_grid2.setupWebGLBuffers();
+				my_mesh2 = new Mesh(my_grid2);
+				
+				my_conjunto = new Conjunto();
+				my_conjunto.add(my_mesh);
+				my_conjunto.add(my_mesh2);*/
             }
             
             function drawScene()
@@ -225,12 +238,17 @@
                 t = t + 0.01;
 				
 				m1 = mat4.create();
+				mat4.translate(m1, m1, vec3.fromValues(0, 0, 5));
 				mat4.rotate(m1, m1, t, vec3.fromValues(0, 1, 0));
-				my_grid.setTransform(m1);
+				my_mesh.setTransform(m1);
 
-                gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
-
+				/*m2 = mat4.create();
+				mat4.translate(m2, m2, vec3.fromValues(0, 5, 0));
+				my_grid2.setTransform(m2);*/
+				
+				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
                 my_grid.drawVertexGrid();
+				//my_grid2.drawVertexGrid();
             }
 
         </script>
