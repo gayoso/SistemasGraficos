@@ -1,3 +1,8 @@
+/****************************************
+GEOMETRY
+Esta clase representa un objeto (por ahora cilindro, plano o esfera) que se dibuja en pantalla
+****************************************/
+
 var GridType = {
 	PLANE : 0,
 	CILINDER : 1,
@@ -9,6 +14,7 @@ var Geometry = function(_rows, _cols, _gridType) {
 	this.cols = _cols;
 	this.rows = _rows;
 	this.gridType = _gridType;
+	this.type = 'Geometry';
 	
 	// hay generacion de indices para TRINANGLE_STRIP y TRIANGLES
 	this.draw_mode = gl.TRIANGLE_STRIP;
@@ -25,6 +31,10 @@ var Geometry = function(_rows, _cols, _gridType) {
 	this.webgl_position_buffer = null;
 	this.webgl_color_buffer = null;
 	this.webgl_index_buffer = null;
+	
+	this.createGrid();
+	this.createIndexBuffer();
+	this.setupWebGLBuffers();
 }
 
 Geometry.prototype = {
@@ -239,7 +249,7 @@ Geometry.prototype = {
 		// hemos creado.
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_position_buffer);
 		// 3. Cargamos datos de las posiciones en el buffer.
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
 
 		// Repetimos los pasos 1. 2. y 3. para la información del color
 		this.webgl_color_buffer = gl.createBuffer();
@@ -274,9 +284,9 @@ Geometry.prototype = {
 		gl.enableVertexAttribArray(vertexColorAttribute);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_color_buffer);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
 		
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
+		//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);
 
 		// Dibujamos.
