@@ -3,18 +3,11 @@ GEOMETRY
 Esta clase representa un objeto (por ahora cilindro, plano o esfera) que se dibuja en pantalla
 ****************************************/
 
-var GridType = {
-	PLANE : 0,
-	CILINDER : 1,
-	SPHERE : 2
-}
-
-var Geometry = function(_rows, _cols, _gridType) {
-	// esto deberia cambiar tal vez, y esta clase ser mas general y otra que herede de esta tener esto
-	this.cols = _cols;
-	this.rows = _rows;
-	this.gridType = _gridType;
-	this.type = 'Geometry';
+var Geometry = function(/*_rows, _cols,*/ _gridType) {
+	
+	if(this.constructor == Geometry){
+		throw new Error("Geometry es abstracta, instanciar una figura particular");
+	}
 	
 	// hay generacion de indices para TRINANGLE_STRIP y TRIANGLES
 	this.draw_mode = gl.TRIANGLE_STRIP;
@@ -31,14 +24,16 @@ var Geometry = function(_rows, _cols, _gridType) {
 	this.webgl_position_buffer = null;
 	this.webgl_color_buffer = null;
 	this.webgl_index_buffer = null;
-	
-	this.createGrid();
-	this.createIndexBuffer();
-	this.setupWebGLBuffers();
 }
 
 Geometry.prototype = {
 	constructor: Geometry,
+	
+	init: function(){
+		this.createGrid();
+		this.createIndexBuffer();
+		this.setupWebGLBuffers();
+	},
 	
 	// aplica la matriz que se quiere, y multiplica la ultima inversa por la inversa de la nueva transformacion
 	// (chequear, no lo probe asi que no se si anda, o la multiplicacion va al reves)
@@ -51,9 +46,20 @@ Geometry.prototype = {
 			vec3.transformMat4(vertex, vertex, matrix);
 			this.position_buffer.splice(i, 3, vertex[0], vertex[1], vertex[2]);
 		}
-		var matrix_inv = mat4.create();
-		mat4.invert(matrix_inv, matrix);
-		mat4.multiply(this.last_matrix, this.last_matrix, matrix_inv);
+	},
+	
+	getCenter: function() {
+		var cant_vert = this.position_buffer.length/3.0;
+		var x_centro = 0, y_centro = 0, z_centro = 0;
+		for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
+			x_centro += this.position_buffer[i];
+			y_centro += this.position_buffer[i+1];
+			z_centro += this.position_buffer[i+2];
+		}
+		x_centro = x_centro / cant_vert;
+		y_centro = y_centro / cant_vert;
+		z_centro = z_centro / cant_vert;
+		return vec3.fromValues(x_centro, y_centro, z_centro);
 	},
 	
 	// multiplica los vertices por la inversa de la ultima matriz que se aplico para volver a los vertices originales
@@ -77,100 +83,8 @@ Geometry.prototype = {
 		mat4.invert(this.last_matrix, matrix);
 	},
 	
-	// funcion 'publica' que deberian llamar de afuera para crear la malla de puntos, segun la forma deseada
-	createGrid: function(){
-		if(this.gridType == GridType.PLANE){
-			this.createUniformPlaneGrid();
-		} else if (this.gridType == GridType.CILINDER){
-			this.createCilinderGrid();
-		} else if (this.gridType == GridType.SPHERE){
-			this.createSphereGrid();
-		}
-	},
-	
-	// crea los puntos de una malla plana con 'rows' filas y 'cols' columnas
-	createUniformPlaneGrid: function(){		
-		for (var i = 0.0; i < this.rows; i++) { 
-		   for (var j = 0.0; j < this.cols; j++) {
-
-			   // Para cada vértice definimos su posición
-			   // como coordenada (x, y, z=0)
-			   this.position_buffer.push(i-(this.rows-1.0)/2.0);
-			   this.position_buffer.push(j-(this.cols-1.0)/2.0);
-			   this.position_buffer.push(0);
-
-			   // Para cada vértice definimos su color
-			   this.color_buffer.push(1.0/this.rows * i);
-			   this.color_buffer.push(0.2);
-			   this.color_buffer.push(1.0/this.cols * j);
-									  
-		   };
-		};
-	},
-	
-	// crea los puntos de una malla cilindrica con 'rows' filas y 'cols' columnas
-	// rows aumenta el largo del cilindro, cols disminuye que tan 'pixelado' es
-	createCilinderGrid: function(){
-		for(var j = 0.0; j < this.cols; j++){
-			this.position_buffer.push(0);
-			this.position_buffer.push(0);
-			this.position_buffer.push(-(this.rows-1)/2);
-			
-			this.color_buffer.push(1.0);
-			this.color_buffer.push(0.2);
-			this.color_buffer.push(1.0);
-		}
-		
-		for (var i = 0.0; i < this.rows; i++) { 
-		   for (var j = 0.0; j < this.cols; j++) {
-
-			   // Para cada vértice definimos su posición
-			   // como coordenada (x, y, z=0)
-			   var angulo = j * 2 * Math.PI / (this.cols-1);
-			   this.position_buffer.push(Math.cos(angulo));
-			   this.position_buffer.push(Math.sin(angulo));
-			   this.position_buffer.push(i-(this.rows-1)/2);
-
-				this.color_buffer.push(0.5);
-				this.color_buffer.push(0.2);
-				this.color_buffer.push(0.3);
-
-		   }
-		}
-		
-		for(var j = 0.0; j < this.cols; j++){
-			this.position_buffer.push(0);
-			this.position_buffer.push(0);
-			this.position_buffer.push(this.rows-1-(this.rows-1)/2);
-			
-			this.color_buffer.push(1.0);
-			this.color_buffer.push(0.2);
-			this.color_buffer.push(1.0);
-		}
-		
-		this.rows++;
-		this.rows++;
-	},
-	
-	// crea los puntos de una malla esferica con 'rows' filas y 'cols' columnas
-	// rows disminuye que tan 'pixelado' es en un eje, cols disminuye que tan 'pixelado' es en el otro eje
-	createSphereGrid: function(){
-		for (var i = 0.0; i < this.rows; i++) { 
-		   for (var j = 0.0; j < this.cols; j++) {
-
-			   var angulo1 = j * 2 * Math.PI / (this.cols-1);
-			   var angulo2 = i * 2 * Math.PI / ((this.rows-1)*2);
-			   var x = Math.sin(angulo2)*Math.cos(angulo1), y = Math.sin(angulo2)*Math.sin(angulo1), z = Math.cos(angulo2);
-			   this.position_buffer.push((x*x+y*y+z*z)*x);
-			   this.position_buffer.push((x*x+y*y+z*z)*y);
-			   this.position_buffer.push((x*x+y*y+z*z)*z);
-
-			   this.color_buffer.push(1.0/this.rows * i);
-			   this.color_buffer.push(0.2);
-			   this.color_buffer.push(1.0);
-		   }
-		}
-	},
+	// las clases derivadas deben redefinir esta funcion
+	createGrid: function(){	},
 	
 	// crea indices para la figura
 	createIndexBuffer: function(){
@@ -267,11 +181,6 @@ Geometry.prototype = {
 
 	// Esta función es la que se encarga de configurar todo lo necesario
 	// para dibujar el VertexGrid.
-	// En el caso del ejemplo puede observarse que la última línea del método
-	// indica dibujar triángulos utilizando los 6 índices cargados en el Index_Buffer
-	// ATIVIDAD 3.
-	// Reemplazar dicha línea de código por la correspondiente para dibujar el strip
-	// de triángulos utilizando el index buffer generado en la ACTIVIDAD 1.
 	drawVertexGrid: function(){
 
 		var vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");

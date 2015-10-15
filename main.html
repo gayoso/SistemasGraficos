@@ -12,8 +12,17 @@
 
         <script type="text/javascript" src="gl-matrix.js"></script>
 		<script type="text/javascript" src="geometry.js"></script>
+		<script type="text/javascript" src="cilindro.js"></script>
+		<script type="text/javascript" src="trapecio.js"></script>
+		<script type="text/javascript" src="triangulo.js"></script>
+		<script type="text/javascript" src="circulo.js"></script>
+		<script type="text/javascript" src="cuadrado.js"></script>
+		<script type="text/javascript" src="cubo.js"></script>
+		<script type="text/javascript" src="prismapentagonal.js"></script>
+		<script type="text/javascript" src="prismahexagonal.js"></script>
+		<script type="text/javascript" src="esfera.js"></script>
 		<script type="text/javascript" src="conjunto.js"></script>
-		<script type="text/javascript" src="Mesh.js"></script>
+		<script type="text/javascript" src="mesh.js"></script>
         <!--
         Vertex shader
 
@@ -117,21 +126,6 @@
                 return shader;
             }
 
-
-            //////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////
-            //
-            // OBJETO GEOMETRY
-            // Definimos un constructor para el objeto Geometry
-            
-            //
-            //////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////
-
-
             function initWebGL()
             {
                 canvas = document.getElementById("my-canvas");  
@@ -202,75 +196,263 @@
                 return shader;
             }
             
+			function cabinaParedAncha(){
+				pared_grande_arriba = new Mesh(new Cuadrado());
+				mat_pared_grande_arriba = mat4.create();
+				mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
+				mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 3, 1));
+				pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
+				
+				pared_grande_abajo = new Mesh(new Cuadrado());
+				mat_pared_grande_abajo = mat4.create();
+				mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1.25));
+				mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(1.5, 3, 1));
+				pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
+				
+				pared_grande_izq = new Mesh(new Cuadrado());
+				mat_pared_grande_izq = mat4.create();
+				mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1.75, 0));
+				mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
+				pared_grande_izq.applyMatrix(mat_pared_grande_izq);
+				
+				pared_grande_der = new Mesh(new Cuadrado());
+				mat_pared_grande_der = mat4.create();
+				mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.75, 0));
+				mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(4, 0.5, 1));
+				pared_grande_der.applyMatrix(mat_pared_grande_der);
+				
+				pared_grande = new Conjunto();
+				pared_grande.add(pared_grande_izq);
+				pared_grande.add(pared_grande_der);
+				pared_grande.add(pared_grande_arriba);
+				pared_grande.add(pared_grande_abajo);
+				
+				var centro = pared_grande.getCenter();
+				vec3.scale(centro, centro, -1);
+				mat_centrar = mat4.create();
+				mat4.translate(mat_centrar, mat_centrar, centro);
+				pared_grande.applyMatrix(mat_centrar);
+				
+				return pared_grande;
+			}
+			
+			function cabinaParedAngosta(){
+				pared_grande_arriba = new Mesh(new Cuadrado());
+				mat_pared_grande_arriba = mat4.create();
+				mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
+				mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 1.5, 1));
+				pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
+				
+				pared_grande_abajo = new Mesh(new Cuadrado());
+				mat_pared_grande_abajo = mat4.create();
+				mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1));
+				mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 1.5, 1));
+				pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
+				
+				pared_grande_izq = new Mesh(new Cuadrado());
+				mat_pared_grande_izq = mat4.create();
+				mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1, 0));
+				mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
+				pared_grande_izq.applyMatrix(mat_pared_grande_izq);
+				
+				pared_grande_der = new Mesh(new Cuadrado());
+				mat_pared_grande_der = mat4.create();
+				mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.0, 0));
+				mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(4, 0.5, 1));
+				pared_grande_der.applyMatrix(mat_pared_grande_der);
+				
+				pared_grande = new Conjunto();
+				pared_grande.add(pared_grande_izq);
+				pared_grande.add(pared_grande_der);
+				pared_grande.add(pared_grande_arriba);
+				pared_grande.add(pared_grande_abajo);
+				
+				var centro = pared_grande.getCenter();
+				vec3.scale(centro, centro, -1);
+				mat_centrar = mat4.create();
+				mat4.translate(mat_centrar, mat_centrar, centro);
+				pared_grande.applyMatrix(mat_centrar);
+				
+				return pared_grande;
+			}
+			
+			function cabinaParedes(){
+				pared_grande1 = cabinaParedAncha();
+				mat_grande1 = mat4.create();
+				mat4.translate(mat_grande1, mat_grande1, vec3.fromValues(0, 1.25, 0));
+				mat4.rotate(mat_grande1, mat_grande1, Math.PI/2, vec3.fromValues(0, 0, 1));
+				pared_grande1.applyMatrix(mat_grande1);
+				
+				pared_grande2 = cabinaParedAncha();
+				mat_grande2 = mat4.create();
+				mat4.translate(mat_grande2, mat_grande2, vec3.fromValues(0, -1.25, 0));
+				mat4.rotate(mat_grande2, mat_grande2, Math.PI/2, vec3.fromValues(0, 0, 1));
+				pared_grande2.applyMatrix(mat_grande2);
+				
+				pared_chica1 = cabinaParedAngosta();
+				mat_chica1 = mat4.create();
+				mat4.translate(mat_chica1, mat_chica1, vec3.fromValues(2, 0, 0));
+				//mat4.rotate(mat_chica1, mat_chica1, Math.PI/2, vec3.fromValues(0, 0, 1));
+				pared_chica1.applyMatrix(mat_chica1);
+				
+				pared_chica2 = cabinaParedAngosta();
+				mat_chica2 = mat4.create();
+				mat4.translate(mat_chica2, mat_chica2, vec3.fromValues(-2, 0, 0));
+				//mat4.rotate(mat_chica2, mat_chica2, Math.PI/2, vec3.fromValues(0, 0, 1));
+				pared_chica2.applyMatrix(mat_chica2);
+				
+				paredes = new Conjunto();
+				paredes.add(pared_grande1);
+				paredes.add(pared_grande2);
+				paredes.add(pared_chica1);
+				paredes.add(pared_chica2);
+				
+				var centro = paredes.getCenter();
+				vec3.scale(centro, centro, -1);
+				mat_centrar = mat4.create();
+				mat4.translate(mat_centrar, mat_centrar, centro);
+				paredes.applyMatrix(mat_centrar);
+				
+				return paredes;
+			}
+			
+			function cabinaTecho(){
+				rect_largo_izq = new Mesh( new Cuadrado() );
+				mat_rect_largo_izq = mat4.create();
+				mat4.translate(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_rect_largo_izq, mat_rect_largo_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(4, 0.6, 1));
+				rect_largo_izq.applyMatrix(mat_rect_largo_izq);
+				
+				rect_largo_der = new Mesh( new Cuadrado() );
+				mat_rect_largo_der = mat4.create();
+				mat4.translate(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(-1, 0, 0));
+				mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(4, 0.6, 1));
+				rect_largo_der.applyMatrix(mat_rect_largo_der);
+				
+				rect_largo_adelante = new Mesh( new Cuadrado() );
+				mat_rect_largo_adelante = mat4.create();
+				mat4.translate(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(0, 0, 2));
+				//mat4.rotate(mat_rect_largo_adelante, mat_rect_largo_adelante, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(2, 0.6, 1));
+				rect_largo_adelante.applyMatrix(mat_rect_largo_adelante);
+				
+				rect_largo_atras = new Mesh( new Cuadrado() );
+				mat_rect_largo_atras = mat4.create();
+				mat4.translate(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(0, 0, -2));
+				//mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(2, 0.6, 1));
+				rect_largo_atras.applyMatrix(mat_rect_largo_atras);
+				
+				triang1 = new Mesh( new Triangulo() );
+				mat_triang1 = mat4.create();
+				mat4.translate(mat_triang1, mat_triang1, vec3.fromValues(0, 0.5*0.6, -2));
+				mat4.rotate(mat_triang1, mat_triang1, Math.PI/2.85, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_triang1, mat_triang1, Math.PI/2, vec3.fromValues(0, 0, 1));
+				mat4.scale(mat_triang1, mat_triang1, vec3.fromValues(2.236, 2, 1));
+				triang1.applyMatrix(mat_triang1);
+				
+				triang2 = new Mesh( new Triangulo() );
+				mat_triang2 = mat4.create();
+				mat4.translate(mat_triang2, mat_triang2, vec3.fromValues(0, 0.5*0.6, 2));
+				mat4.rotate(mat_triang2, mat_triang2, -Math.PI/2.85, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_triang2, mat_triang2, Math.PI/2, vec3.fromValues(0, 0, 1));
+				mat4.scale(mat_triang2, mat_triang2, vec3.fromValues(2.236, 2, 1));
+				triang2.applyMatrix(mat_triang2);
+				
+				triang3 = new Mesh( new Triangulo() );
+				mat_triang3 = mat4.create();
+				mat4.translate(mat_triang3, mat_triang3, vec3.fromValues(-1, 0.5*0.6, 0));
+				mat4.rotate(mat_triang3, mat_triang3, -Math.PI/4, vec3.fromValues(0, 0, 1));
+				mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_triang3, mat_triang3, vec3.fromValues(1.414, 4, 1));
+				triang3.applyMatrix(mat_triang3);
+				
+				triang4 = new Mesh( new Triangulo() );
+				mat_triang4 = mat4.create();
+				mat4.translate(mat_triang4, mat_triang4, vec3.fromValues(1, 0.5*0.6, 0));
+				mat4.rotate(mat_triang4, mat_triang4, Math.PI/4, vec3.fromValues(0, 0, 1));
+				mat4.rotate(mat_triang4, mat_triang4, Math.PI/2, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_triang4, mat_triang4, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_triang4, mat_triang4, vec3.fromValues(1.414, 4, 1));
+				triang4.applyMatrix(mat_triang4);
+				
+				techo = new Conjunto();
+				techo.add(rect_largo_izq);
+				techo.add(rect_largo_der);
+				techo.add(rect_largo_adelante);
+				techo.add(rect_largo_atras);
+				techo.add(triang1);
+				techo.add(triang2);
+				techo.add(triang3);
+				techo.add(triang4);
+				
+				return techo;
+			}
+			
+			function cabinaTechoParedes(){
+				paredes = cabinaParedes();
+				mat_p = mat4.create();
+				mat4.rotate(mat_p, mat_p, Math.PI/2, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_p, mat_p, Math.PI/2, vec3.fromValues(0, 0, 1));
+				paredes.applyMatrix(mat_p);
+				
+				techo = cabinaTecho();
+				mat_t = mat4.create();
+				mat4.translate(mat_t, mat_t, vec3.fromValues(0, 1.8, 0));
+				mat4.scale(mat_t, mat_t, vec3.fromValues(1.3, 0.8, 1.05));
+				techo.applyMatrix(mat_t);
+				
+				paredes_techo = new Conjunto();
+				paredes_techo.add(paredes);
+				paredes_techo.add(techo);
+				return paredes_techo;
+			}
+			
             function setupBuffers()
             {
-                my_grid = new Geometry(9, 10, GridType.CILINDER);
-				my_mesh = new Mesh();
-				my_mesh.add(my_grid);
-				
-				my_grid2 = new Geometry(9, 10, GridType.CILINDER);
-				my_mesh2 = new Mesh(my_grid2);
-				
-				my_mesh3 = new Mesh(new Geometry(4, 4, GridType.PLANE));
-				my_mesh4 = new Mesh(new Geometry(100, 100, GridType.SPHERE));
-				
-				my_conjunto2 = new Conjunto();
-				my_conjunto2.add(my_mesh3);
-				my_conjunto2.add(my_mesh4);
-				
-				my_conjunto = new Conjunto();
-				my_conjunto.add(my_mesh);
-				my_conjunto.add(my_mesh2);
-				my_conjunto.add(my_conjunto2);
+				paredes_techo = cabinaTechoParedes();
             }
             
             function drawScene()
             {
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
+                
                 // Preparamos una matriz de perspectiva.
+				var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
                 mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100.0);
                 gl.uniformMatrix4fv(u_proj_matrix, false, pMatrix);
 
-                var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
                 // Preparamos una matriz de modelo+vista.
+				var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
                 mat4.identity(mvMatrix);
-                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -20.0]);
+                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0]);
+				mat4.rotate(mvMatrix, mvMatrix, Math.PI/7, [1.0, 0.0, 0.0]);
 				mat4.rotate(mvMatrix, mvMatrix, Math.PI/2, [0.0, 1.0, 0.0]);
+				mat4.rotate(mvMatrix, mvMatrix, t/2, [0.0, 1.0, 0.0]);
+				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/3, [0.0, 0.0, 1.0]);
+				//mat4.lookAt(mvMatrix, (0, 0, -10), (0, 0, 0), (0, 1, 0));
 				//mat4.rotate(mvMatrix, mvMatrix, t, [0.0, 1.0, 0.0]);
                 t = t + 0.01;
-				
-				m1 = mat4.create();
-				mat4.translate(m1, m1, vec3.fromValues(0, 0, 5));
-				mat4.rotate(m1, m1, t, vec3.fromValues(0, 1, 0));
-				my_mesh.setTransform(m1);
-				
-				m2 = mat4.create();
-				mat4.translate(m2, m2, vec3.fromValues(0, 0, -3));
-				mat4.rotate(m2, m2, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.rotate(m2, m2, t, vec3.fromValues(0, 1, 0));
-				my_mesh2.setTransform(m2);
-				
-				m3 = mat4.create();
-				mat4.rotate(m3, m3, t, vec3.fromValues(1, 0, 0));
-				mat4.translate(m3, m3, vec3.fromValues(0, 3, 0));
-				mat4.scale(m3, m3, vec3.fromValues(0.5, 0.5, 0.5));
-				my_conjunto.setTransform(m3);
-				
-				m4 = mat4.create();
-				mat4.rotate(m4, m4, t, vec3.fromValues(0, -1, 0));
-				mat4.translate(m4, m4, vec3.fromValues(2.2, 0, 0));
-				mat4.scale(m4, m4, vec3.fromValues(0.5, 1, 0.5));
-				my_mesh4.setTransform(m4);
-				
-				m5 = mat4.create();
-				mat4.rotate(m5, m5, Math.PI/2, vec4.fromValues(0, 1, 0));
-				mat4.scale(m5, m5, vec3.fromValues(5, 5, 1));
-				my_conjunto2.setTransform(m5);
-				
-				
 				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
-				my_conjunto.render();
+				
+				// Transformaciones a los modelos
+				m1 = mat4.create();
+				mat4.rotate(m1, m1, t, vec3.fromValues(0, 1, 0));
+				//pared_grande.render();
+				//pared_chica1.setTransform(m1);
+				//paredes.render();
+				paredes_techo.render();
             }
 
         </script>

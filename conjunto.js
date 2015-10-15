@@ -7,12 +7,9 @@ No representa nada que se dibuje, pero dibuja y aplica transformaciones a todos 
 var Conjunto = function() {
 	this.matrix_local = mat4.create();
 	this.matrix_total = mat4.create();
-	/*this.position = vec3.fromValues(0, 0, 0);
-	this.scale = vec3.fromValues(1, 1, 1);
-	this.rotation = vec3.fromValues(0, 0, 0);*/
 	this.parent = null;
 	this.children = [];
-	this.type = 'Conjunto';
+	//this.type = 'Conjunto';
 }
 
 Conjunto.prototype = {
@@ -21,8 +18,9 @@ Conjunto.prototype = {
 	
 	// modifica los vertices segun una matriz de escala+rotacion+traslacion
 	applyMatrix: function(m){
-		// ver si esto esta bien, o la mult es al reves
-		mat4.multiply(this.matrix_local, this.matrix_local, m);
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].applyMatrix(m);
+		}
 	},
 	
 	// vuelve al estado inicial todos los vertices, aplica la transf y propaga los cambios a sus hijos
@@ -48,13 +46,8 @@ Conjunto.prototype = {
 	
 	// agrega un hijo (y me agrego como padre en el hijo)
 	add: function(object){
-		if(object.type === 'Geometry'){
-			tempMesh = new Mesh(object);
-			this.add(tempMesh);
-		} else {
-			object.parent = this;
-			this.children.push(object);
-		}
+		object.parent = this;
+		this.children.push(object);
 	},
 	
 	// borra a un hijo (y se borra como padre en el hijo)
@@ -70,5 +63,15 @@ Conjunto.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 			this.children[i].render();
 		}
+	},
+	
+	getCenter: function(){
+		var centro_hijos = vec3.fromValues(0, 0, 0);
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			var centro_hijo = this.children[i].getCenter();
+			vec3.add(centro_hijos, centro_hijos, centro_hijo);
+		}
+		vec3.scale(centro_hijos, centro_hijos, 1/this.children.length);
+		return centro_hijos;
 	}
 }

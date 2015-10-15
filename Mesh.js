@@ -5,26 +5,16 @@ Esta clase es en definitiva un 'Conjunto' que tiene un objeto 'Geometry'
 ****************************************/
 
 var Mesh = function(geometry){
-	Conjunto.call(this)
+	Conjunto.call(this);
 	
-	this.geometry = geometry !== undefined ? geometry : new Geometry(2, 2, GridType.PLANE);
-	this.type = 'Mesh';
+	this.geometry = geometry;
+	//this.type = 'Mesh';
 }
 
 Mesh.prototype = Object.create(Conjunto.prototype);
 Mesh.prototype.constructor = Mesh;
 
 Mesh.prototype.updateMatrix = function(){
-	/*if(this.parent === null){
-		mat4.copy(this.matrix_total, this.matrix_local);
-	} else {
-		// ver si esto esta bien, o la mult es al reves
-		mat4.multiply(this.matrix_total, this.parent.matrix_total, this.matrix_local);
-	}
-	
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-		this.children[i].updateMatrix();
-	}*/
 	Conjunto.prototype.updateMatrix.call(this);
 	
 	this.geometry.setTransform(this.matrix_total);
@@ -36,11 +26,25 @@ Mesh.prototype.render = function(){
 };
 
 Mesh.prototype.add = function(object){
-	if(object.type === 'Geometry'){
+	if(object instanceof Geometry){
 		this.geometry = object;
 	} else {
-		/*object.parent = this;
-		this.children.push(object);*/
 		Conjunto.prototype.add.call(this, object);
 	}
 };
+
+// modifica los vertices segun una matriz de escala+rotacion+traslacion
+Mesh.prototype.applyMatrix = function(m){
+	this.geometry.applyMatrix(m);
+	Conjunto.prototype.applyMatrix.call(this, m);
+};
+
+Mesh.prototype.getCenter = function(){
+	var centro = this.geometry.getCenter();
+	if(this.children.length > 0){
+		var hijos_centro = Conjunto.prototype.getCenter.call(this);
+		vec3.add(centro, centro, hijos_centro);
+		vec3.scale(centro, centro, 0.5);
+	}
+	return centro;
+}

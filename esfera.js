@@ -1,0 +1,43 @@
+
+var Esfera = function(){
+	this.setRows();
+	this.setCols();
+	
+	Geometry.call(this, this.gridType);
+	this.init();
+}
+
+Esfera.prototype = Object.create(Geometry.prototype);
+Esfera.prototype.constructor = Esfera;
+
+Esfera.prototype.createGrid = function(){
+	this.createSphereGrid();
+}
+
+Esfera.prototype.setRows = function(){
+	this.rows = 50;
+}
+
+Esfera.prototype.setCols = function(){
+	this.cols = 50;
+}
+
+// crea los puntos de una malla esferica con 'rows' filas y 'cols' columnas
+// rows disminuye que tan 'pixelado' es en un eje, cols disminuye que tan 'pixelado' es en el otro eje
+Esfera.prototype.createSphereGrid = function(){
+	for (var i = 0.0; i < this.rows; i++) { 
+	   for (var j = 0.0; j < this.cols; j++) {
+
+		   var angulo1 = j * 2 * Math.PI / (this.cols-1);
+		   var angulo2 = i * 2 * Math.PI / ((this.rows-1)*2);
+		   var x = Math.sin(angulo2)*Math.cos(angulo1), y = Math.sin(angulo2)*Math.sin(angulo1), z = Math.cos(angulo2);
+		   this.position_buffer.push((x*x+y*y+z*z)*x);
+		   this.position_buffer.push((x*x+y*y+z*z)*y);
+		   this.position_buffer.push((x*x+y*y+z*z)*z);
+
+		   this.color_buffer.push(1.0/this.rows * i);
+		   this.color_buffer.push(0.2);
+		   this.color_buffer.push(1.0);
+	   }
+	}
+}
