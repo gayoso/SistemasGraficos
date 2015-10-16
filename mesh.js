@@ -20,6 +20,12 @@ Mesh.prototype.updateMatrix = function(){
 	this.geometry.setTransform(this.matrix_total);
 };
 
+/*// vuelve al estado inicial todos los vertices, aplica la transf y propaga los cambios a sus hijos
+Mesh.prototype.setTransform = function(m){
+	mat4.copy(this.matrix_local, m);
+	this.updateMatrix();
+},*/
+
 Mesh.prototype.render = function(){
 	this.geometry.drawVertexGrid();
 	Conjunto.prototype.render.call(this);
@@ -47,4 +53,9 @@ Mesh.prototype.getCenter = function(){
 		vec3.scale(centro, centro, 0.5);
 	}
 	return centro;
-}
+};
+
+Mesh.prototype.setColor = function(color){
+	//Conjunto.prototype.setColor.call(color);
+	this.geometry.setColor(color);
+};

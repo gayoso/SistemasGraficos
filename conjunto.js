@@ -29,6 +29,10 @@ Conjunto.prototype = {
 		this.applyMatrix(m);*/
 		mat4.copy(this.matrix_local, m);
 		this.updateMatrix();
+		
+		/*for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setTransform(m);
+		}*/
 	},
 	
 	updateMatrix: function(){
@@ -42,6 +46,10 @@ Conjunto.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 			this.children[i].updateMatrix();
 		}
+	},
+	
+	get: function(i){
+		return this.children[i];
 	},
 	
 	// agrega un hijo (y me agrego como padre en el hijo)
@@ -73,5 +81,11 @@ Conjunto.prototype = {
 		}
 		vec3.scale(centro_hijos, centro_hijos, 1/this.children.length);
 		return centro_hijos;
+	},
+	
+	setColor: function(color){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setColor(color);
+		}
 	}
 }

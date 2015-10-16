@@ -20,9 +20,12 @@
 		<script type="text/javascript" src="cubo.js"></script>
 		<script type="text/javascript" src="prismapentagonal.js"></script>
 		<script type="text/javascript" src="prismahexagonal.js"></script>
+		<script type="text/javascript" src="prismatriangular.js"></script>
 		<script type="text/javascript" src="esfera.js"></script>
 		<script type="text/javascript" src="conjunto.js"></script>
 		<script type="text/javascript" src="mesh.js"></script>
+		<script type="text/javascript" src="cabina.js"></script>
+		<script type="text/javascript" src="color.js"></script>
         <!--
         Vertex shader
 
@@ -196,304 +199,223 @@
                 return shader;
             }
             
-			function cabinaParedAncha(){
-				pared_grande_arriba = new Mesh(new Cuadrado());
-				mat_pared_grande_arriba = mat4.create();
-				mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
-				mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 3, 1));
-				pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
+			
+			
+			function rueda_vigas(){
+				factor_escala = 0.10;
 				
-				pared_grande_abajo = new Mesh(new Cuadrado());
-				mat_pared_grande_abajo = mat4.create();
-				mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1.25));
-				mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(1.5, 3, 1));
-				pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
+				viga1 = new Mesh( new Cubo() );
+				mat_1 = mat4.create();
+				mat4.scale(mat_1, mat_1, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga1.applyMatrix(mat_1);
 				
-				pared_grande_izq = new Mesh(new Cuadrado());
-				mat_pared_grande_izq = mat4.create();
-				mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1.75, 0));
-				mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
-				pared_grande_izq.applyMatrix(mat_pared_grande_izq);
+				viga2 = new Mesh( new Cubo() );
+				mat_2 = mat4.create();
+				mat4.rotate(mat_2, mat_2, Math.PI/2, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_2, mat_2, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga2.applyMatrix(mat_2);
 				
-				pared_grande_der = new Mesh(new Cuadrado());
-				mat_pared_grande_der = mat4.create();
-				mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.75, 0));
-				mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(4, 0.5, 1));
-				pared_grande_der.applyMatrix(mat_pared_grande_der);
+				viga3 = new Mesh( new Cubo() );
+				mat_3 = mat4.create();
+				mat4.rotate(mat_3, mat_3, Math.PI/4, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_3, mat_3, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga3.applyMatrix(mat_3);
 				
-				pared_grande = new Conjunto();
-				pared_grande.add(pared_grande_izq);
-				pared_grande.add(pared_grande_der);
-				pared_grande.add(pared_grande_arriba);
-				pared_grande.add(pared_grande_abajo);
+				viga4 = new Mesh( new Cubo() );
+				mat_4 = mat4.create();
+				mat4.rotate(mat_4, mat_4, -Math.PI/4, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_4, mat_4, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga4.applyMatrix(mat_4);
 				
-				var centro = pared_grande.getCenter();
-				vec3.scale(centro, centro, -1);
-				mat_centrar = mat4.create();
-				mat4.translate(mat_centrar, mat_centrar, centro);
-				pared_grande.applyMatrix(mat_centrar);
+				viga5 = new Mesh( new Cubo() );
+				mat_5 = mat4.create();
+				mat4.rotate(mat_5, mat_5, -Math.PI/8, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_5, mat_5, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga5.applyMatrix(mat_5);
 				
-				return pared_grande;
+				viga6 = new Mesh( new Cubo() );
+				mat_6 = mat4.create();
+				mat4.rotate(mat_6, mat_6, Math.PI/8, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_6, mat_6, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga6.applyMatrix(mat_6);
+				
+				viga7 = new Mesh( new Cubo() );
+				mat_7 = mat4.create();
+				mat4.rotate(mat_7, mat_7, 3*Math.PI/8, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_7, mat_7, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga7.applyMatrix(mat_7);
+				
+				viga8 = new Mesh( new Cubo() );
+				mat_8 = mat4.create();
+				mat4.rotate(mat_8, mat_8, -3*Math.PI/8, vec3.fromValues(1, 0, 0));
+				mat4.scale(mat_8, mat_8, vec3.fromValues(factor_escala, factor_escala, 10));
+				viga8.applyMatrix(mat_8);
+				
+				//vigas_hor = [];
+				var vigas = new Conjunto();
+				vigas.add(viga1);
+				vigas.add(viga2);
+				vigas.add(viga3);
+				vigas.add(viga4);
+				vigas.add(viga5);
+				vigas.add(viga6);
+				vigas.add(viga7);
+				vigas.add(viga8);
+				
+				for(i = 0; i < 16; ++i){
+					viga_temp = new Mesh( new Cubo() );
+					mat_hor_1 = mat4.create();
+					mat4.rotate(mat_hor_1, mat_hor_1, (1+2*i)*Math.PI/16, vec3.fromValues(1, 0, 0));
+					mat4.translate(mat_hor_1, mat_hor_1, vec3.fromValues(0, 0, -4.9));
+					mat4.rotate(mat_hor_1, mat_hor_1, Math.PI/2, vec3.fromValues(1, 0, 0));
+					mat4.scale(mat_hor_1, mat_hor_1, vec3.fromValues(factor_escala, factor_escala, 2));
+					viga_temp.applyMatrix(mat_hor_1);
+					vigas.add(viga_temp);
+					
+					viga_temp2 = new Mesh( new Cubo() );
+					mat_hor_2 = mat4.create();
+					mat4.rotate(mat_hor_2, mat_hor_2, (1+2*i)*Math.PI/16, vec3.fromValues(1, 0, 0));
+					mat4.translate(mat_hor_2, mat_hor_2, vec3.fromValues(0, 0, -2.8));
+					mat4.rotate(mat_hor_2, mat_hor_2, Math.PI/2, vec3.fromValues(1, 0, 0));
+					mat4.scale(mat_hor_2, mat_hor_2, vec3.fromValues(factor_escala, factor_escala, 1.3));
+					viga_temp2.applyMatrix(mat_hor_2);
+					vigas.add(viga_temp2);
+				}
+				
+				/*soporte = new Mesh( new PrismaTriangular() );
+				mat_soporte = mat4.create();
+				mat4.translate(mat_soporte, mat_soporte, vec3.fromValues(-0.25, -3.5, 0));
+				mat4.rotate(mat_soporte, mat_soporte, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_soporte, mat_soporte, vec3.fromValues(2, 6, 0.25));
+				soporte.applyMatrix(mat_soporte);
+				vigas.add(soporte);*/
+				
+				/*bolt = new Mesh( new Cilindro() );
+				mat_bolt = mat4.create();
+				mat4.translate(mat_bolt, mat_bolt, vec3.fromValues(-0.5, 0, 0));
+				mat4.rotate(mat_bolt, mat_bolt, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_bolt, mat_bolt, vec3.fromValues(0.35, 0.35, 0.4));
+				bolt.applyMatrix(mat_bolt);
+				vigas.add(bolt);*/
+				
+				return vigas;
 			}
 			
-			function cabinaParedAngosta(){
-				pared_grande_arriba = new Mesh(new Cuadrado());
-				mat_pared_grande_arriba = mat4.create();
-				mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
-				mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 1.5, 1));
-				pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
-				
-				pared_grande_abajo = new Mesh(new Cuadrado());
-				mat_pared_grande_abajo = mat4.create();
-				mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1));
-				mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 1.5, 1));
-				pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
-				
-				pared_grande_izq = new Mesh(new Cuadrado());
-				mat_pared_grande_izq = mat4.create();
-				mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1, 0));
-				mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
-				pared_grande_izq.applyMatrix(mat_pared_grande_izq);
-				
-				pared_grande_der = new Mesh(new Cuadrado());
-				mat_pared_grande_der = mat4.create();
-				mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.0, 0));
-				mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(4, 0.5, 1));
-				pared_grande_der.applyMatrix(mat_pared_grande_der);
-				
-				pared_grande = new Conjunto();
-				pared_grande.add(pared_grande_izq);
-				pared_grande.add(pared_grande_der);
-				pared_grande.add(pared_grande_arriba);
-				pared_grande.add(pared_grande_abajo);
-				
-				var centro = pared_grande.getCenter();
-				vec3.scale(centro, centro, -1);
-				mat_centrar = mat4.create();
-				mat4.translate(mat_centrar, mat_centrar, centro);
-				pared_grande.applyMatrix(mat_centrar);
-				
-				return pared_grande;
+			function soporte(){
+				s = new Mesh( new PrismaTriangular() );
+				mat_soporte = mat4.create();
+				mat4.translate(mat_soporte, mat_soporte, vec3.fromValues(-0.25, -4.5, 0));
+				mat4.rotate(mat_soporte, mat_soporte, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_soporte, mat_soporte, vec3.fromValues(2, 7, 0.25));
+				s.applyMatrix(mat_soporte);
+				return s;
 			}
 			
-			function cabinaParedes(){
-				pared_grande1 = cabinaParedAncha();
-				mat_grande1 = mat4.create();
-				mat4.translate(mat_grande1, mat_grande1, vec3.fromValues(0, 1.25, 0));
-				mat4.rotate(mat_grande1, mat_grande1, Math.PI/2, vec3.fromValues(0, 0, 1));
-				pared_grande1.applyMatrix(mat_grande1);
+			function ruedas_y_vigas(){
+				// corro rueda y soporte a izq
+				rueda_izq = rueda_vigas();
+				soporte_izq = soporte();
+				rueda_y_soporte_izq = new Conjunto();
+				rueda_y_soporte_izq.add(rueda_izq);
+				rueda_y_soporte_izq.add(soporte_izq);
+				rueda_y_soporte_izq.setColor(Color.WHITE);
 				
-				pared_grande2 = cabinaParedAncha();
-				mat_grande2 = mat4.create();
-				mat4.translate(mat_grande2, mat_grande2, vec3.fromValues(0, -1.25, 0));
-				mat4.rotate(mat_grande2, mat_grande2, Math.PI/2, vec3.fromValues(0, 0, 1));
-				pared_grande2.applyMatrix(mat_grande2);
-				
-				pared_chica1 = cabinaParedAngosta();
-				mat_chica1 = mat4.create();
-				mat4.translate(mat_chica1, mat_chica1, vec3.fromValues(2, 0, 0));
-				//mat4.rotate(mat_chica1, mat_chica1, Math.PI/2, vec3.fromValues(0, 0, 1));
-				pared_chica1.applyMatrix(mat_chica1);
-				
-				pared_chica2 = cabinaParedAngosta();
-				mat_chica2 = mat4.create();
-				mat4.translate(mat_chica2, mat_chica2, vec3.fromValues(-2, 0, 0));
-				//mat4.rotate(mat_chica2, mat_chica2, Math.PI/2, vec3.fromValues(0, 0, 1));
-				pared_chica2.applyMatrix(mat_chica2);
-				
-				paredes = new Conjunto();
-				paredes.add(pared_grande1);
-				paredes.add(pared_grande2);
-				paredes.add(pared_chica1);
-				paredes.add(pared_chica2);
-				
-				var centro = paredes.getCenter();
-				vec3.scale(centro, centro, -1);
-				mat_centrar = mat4.create();
-				mat4.translate(mat_centrar, mat_centrar, centro);
-				paredes.applyMatrix(mat_centrar);
-				
-				return paredes;
-			}
-			
-			function cabinaTecho(){
-				rect_largo_izq = new Mesh( new Cuadrado() );
-				mat_rect_largo_izq = mat4.create();
-				mat4.translate(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_rect_largo_izq, mat_rect_largo_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(4, 0.6, 1));
-				rect_largo_izq.applyMatrix(mat_rect_largo_izq);
-				
-				rect_largo_der = new Mesh( new Cuadrado() );
-				mat_rect_largo_der = mat4.create();
-				mat4.translate(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(-1, 0, 0));
-				mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(4, 0.6, 1));
-				rect_largo_der.applyMatrix(mat_rect_largo_der);
-				
-				rect_largo_adelante = new Mesh( new Cuadrado() );
-				mat_rect_largo_adelante = mat4.create();
-				mat4.translate(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(0, 0, 2));
-				//mat4.rotate(mat_rect_largo_adelante, mat_rect_largo_adelante, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(2, 0.6, 1));
-				rect_largo_adelante.applyMatrix(mat_rect_largo_adelante);
-				
-				rect_largo_atras = new Mesh( new Cuadrado() );
-				mat_rect_largo_atras = mat4.create();
-				mat4.translate(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(0, 0, -2));
-				//mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(2, 0.6, 1));
-				rect_largo_atras.applyMatrix(mat_rect_largo_atras);
-				
-				triang1 = new Mesh( new Triangulo() );
-				mat_triang1 = mat4.create();
-				mat4.translate(mat_triang1, mat_triang1, vec3.fromValues(0, 0.5*0.6, -2));
-				mat4.rotate(mat_triang1, mat_triang1, Math.PI/2.85, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_triang1, mat_triang1, Math.PI/2, vec3.fromValues(0, 0, 1));
-				mat4.scale(mat_triang1, mat_triang1, vec3.fromValues(2.236, 2, 1));
-				triang1.applyMatrix(mat_triang1);
-				
-				triang2 = new Mesh( new Triangulo() );
-				mat_triang2 = mat4.create();
-				mat4.translate(mat_triang2, mat_triang2, vec3.fromValues(0, 0.5*0.6, 2));
-				mat4.rotate(mat_triang2, mat_triang2, -Math.PI/2.85, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_triang2, mat_triang2, Math.PI/2, vec3.fromValues(0, 0, 1));
-				mat4.scale(mat_triang2, mat_triang2, vec3.fromValues(2.236, 2, 1));
-				triang2.applyMatrix(mat_triang2);
-				
-				triang3 = new Mesh( new Triangulo() );
-				mat_triang3 = mat4.create();
-				mat4.translate(mat_triang3, mat_triang3, vec3.fromValues(-1, 0.5*0.6, 0));
-				mat4.rotate(mat_triang3, mat_triang3, -Math.PI/4, vec3.fromValues(0, 0, 1));
-				mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_triang3, mat_triang3, vec3.fromValues(1.414, 4, 1));
-				triang3.applyMatrix(mat_triang3);
-				
-				triang4 = new Mesh( new Triangulo() );
-				mat_triang4 = mat4.create();
-				mat4.translate(mat_triang4, mat_triang4, vec3.fromValues(1, 0.5*0.6, 0));
-				mat4.rotate(mat_triang4, mat_triang4, Math.PI/4, vec3.fromValues(0, 0, 1));
-				mat4.rotate(mat_triang4, mat_triang4, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_triang4, mat_triang4, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_triang4, mat_triang4, vec3.fromValues(1.414, 4, 1));
-				triang4.applyMatrix(mat_triang4);
-				
-				techo = new Conjunto();
-				techo.add(rect_largo_izq);
-				techo.add(rect_largo_der);
-				techo.add(rect_largo_adelante);
-				techo.add(rect_largo_atras);
-				techo.add(triang1);
-				techo.add(triang2);
-				techo.add(triang3);
-				techo.add(triang4);
-				
-				return techo;
-			}
-			
-			function cabinaTechoParedes(){
-				paredes = cabinaParedes();
-				mat_p = mat4.create();
-				mat4.rotate(mat_p, mat_p, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_p, mat_p, Math.PI/2, vec3.fromValues(0, 0, 1));
-				paredes.applyMatrix(mat_p);
-				
-				techo = cabinaTecho();
-				mat_t = mat4.create();
-				mat4.translate(mat_t, mat_t, vec3.fromValues(0, 1.8, 0));
-				mat4.scale(mat_t, mat_t, vec3.fromValues(1.3, 0.8, 1.05));
-				techo.applyMatrix(mat_t);
-				
-				paredes_techo = new Conjunto();
-				paredes_techo.add(paredes);
-				paredes_techo.add(techo);
-				return paredes_techo;
-			}
-
-			function cabinaPiso(){
-				piso_izq = new Mesh( new Trapecio(7) );
 				mat_izq = mat4.create();
-				mat4.translate(mat_izq, mat_izq, vec3.fromValues(0, 0, 1));
-				mat4.rotate(mat_izq, mat_izq, 0.4646, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_izq, mat_izq, vec3.fromValues(0.558, 4, 1));
-				mat4.translate(mat_izq, mat_izq, vec3.fromValues(0.5, 0, 0));
-				piso_izq.applyMatrix(mat_izq);
-
-				piso_der = new Mesh( new Trapecio(7) );
-				mat_der= mat4.create();
-				mat4.translate(mat_der, mat_der, vec3.fromValues(0, 0, -1));
-				mat4.rotate(mat_der, mat_der, -0.4646, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_der, mat_der, vec3.fromValues(0.558, 4, 1));
-				mat4.translate(mat_der, mat_der, vec3.fromValues(0.5, 0, 0));
-				piso_der.applyMatrix(mat_der);
-
-				piso_atras = new Mesh( new Trapecio(7) );
-				mat_atras = mat4.create();
-				mat4.translate(mat_atras, mat_atras, vec3.fromValues(0, 2, 0));
-				mat4.rotate(mat_atras, mat_atras, -0.785, vec3.fromValues(0, 0, 1));
-				mat4.rotate(mat_atras, mat_atras, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.scale(mat_atras, mat_atras, vec3.fromValues(0.7071, 2, 1));
-				mat4.translate(mat_atras, mat_atras, vec3.fromValues(0.5, 0, 0));
-				piso_atras.applyMatrix(mat_atras);
-
-				piso_adelante = new Mesh( new Trapecio(7) );
-				mat_adelante = mat4.create();
-				mat4.translate(mat_adelante, mat_adelante, vec3.fromValues(0, -2, 0));
-				mat4.rotate(mat_adelante, mat_adelante, 0.785, vec3.fromValues(0, 0, 1));
-				mat4.rotate(mat_adelante, mat_adelante, Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.scale(mat_adelante, mat_adelante, vec3.fromValues(0.7071, 2, 1));
-				mat4.translate(mat_adelante, mat_adelante, vec3.fromValues(0.5, 0, 0));
-				piso_adelante.applyMatrix(mat_adelante);
-
-				piso_plano = new Mesh( new Cuadrado() );
-				mat_plano = mat4.create();
-				mat4.translate(mat_plano, mat_plano, vec3.fromValues(0.5, 0, 0));
-				mat4.rotate(mat_plano, mat_plano, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_plano, mat_plano, vec3.fromValues(1.5, 3, 1));
-				piso_plano.applyMatrix(mat_plano);
-
-				piso = new Conjunto();
-				piso.add(piso_izq);
-				piso.add(piso_der);
-				piso.add(piso_atras);
-				piso.add(piso_adelante);
-				piso.add(piso_plano);
-
-				return piso;
-			}
-
-			function cabina(){
-				paredes_techo = cabinaTechoParedes();
-
-				piso = cabinaPiso();
-				mat_piso = mat4.create();
-				mat4.translate(mat_piso, mat_piso, vec3.fromValues(0, -2.11, 0));
-				mat4.rotate(mat_piso, mat_piso, -Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.rotate(mat_piso, mat_piso, Math.PI/2, vec3.fromValues(0, 1, 0));
-				mat4.scale(mat_piso, mat_piso, vec3.fromValues(1, 1.05, 1.25));
-				piso.applyMatrix(mat_piso);
-
-				cabina = new Conjunto();
-				cabina.add(paredes_techo);
-				cabina.add(piso);
-
-				//centrar (ya esta centrado)
-
-				return cabina;
+				mat4.translate(mat_izq, mat_izq, vec3.fromValues(-1, 0, 0));
+				rueda_y_soporte_izq.applyMatrix(mat_izq);
+				
+				// corro rueda y soporte a der
+				rueda_der = rueda_vigas();
+				soporte_der = soporte();
+				rueda_y_soporte_der = new Conjunto();
+				rueda_y_soporte_der.add(rueda_der);
+				rueda_y_soporte_der.add(soporte_der);
+				rueda_y_soporte_der.setColor(Color.WHITE);
+				
+				mat_der = mat4.create();
+				mat4.translate(mat_der, mat_der, vec3.fromValues(1, 0, 0));
+				mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(0, 1, 0));
+				rueda_y_soporte_der.applyMatrix(mat_der);
+				
+				// conjunto de lo que va a girar
+				ruedas = new Conjunto();
+				ruedas.add(rueda_izq);
+				ruedas.add(rueda_der);
+				
+				// vuelta al mundo
+				ruedas_y_soportes = new Conjunto();
+				ruedas_y_soportes.add(ruedas);
+				ruedas_y_soportes.add(soporte_izq);
+				ruedas_y_soportes.add(soporte_der);				
+				
+				// cabinas y soportes horizontales
+				cabinas = new Conjunto();
+				ruedas.add(cabinas);
+				
+				var colores_cabinas = [ Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, 
+										Color.CYAN, Color.BLUE, Color.MED_PURPLE, Color.PINK]
+				
+				for(i = 0; i < 8; ++i){
+					var viga_temp = new Mesh( new Cubo() );
+					var mat_hor_1 = mat4.create();
+					mat4.rotate(mat_hor_1, mat_hor_1, (1+2*i)*Math.PI/8, vec3.fromValues(1, 0, 0));
+					mat4.translate(mat_hor_1, mat_hor_1, vec3.fromValues(0, 0, -4.9));
+					mat4.rotate(mat_hor_1, mat_hor_1, Math.PI/2, vec3.fromValues(0, 0, 1));
+					mat4.rotate(mat_hor_1, mat_hor_1, Math.PI/2, vec3.fromValues(1, 0, 0));
+					mat4.scale(mat_hor_1, mat_hor_1, vec3.fromValues(factor_escala, factor_escala, 2));
+					viga_temp.applyMatrix(mat_hor_1);
+					viga_temp.setColor(Color.WHITE);
+					ruedas.add(viga_temp);
+					//ruedas_y_soportes.add(viga_temp);
+					
+					var cabin = new Cabina(colores_cabinas[i]);
+					var mat_cab = mat4.create();
+					var offset_vert = 4.7;
+					
+					/*var mat_cambiar_eje = mat4.create();
+					mat4.translate(mat_cambiar_eje, mat_cambiar_eje, vec3.fromValues(0, -1.5, 0));
+					cabin.applyMatrix(mat_cambiar_eje);*/
+					
+					mat4.rotate(mat_cab, mat_cab, (1+2*i)*Math.PI/8, vec3.fromValues(1, 0, 0));
+					mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, 0, -4.9));
+					mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
+					//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, -offset_vert, 0));
+					cabin.applyMatrix(mat_cab);
+					
+					var centro = cabin.getCenter();
+					var centro_inv = vec3.clone(centro);
+					vec3.scale(centro_inv, centro_inv, -1);
+					mat_cab = mat4.create();
+					//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, offset_vert, 0));
+					mat4.translate(mat_cab, mat_cab, centro);
+					mat4.rotate(mat_cab, mat_cab, -(1+2*i)*Math.PI/8, vec3.fromValues(1, 0, 0));
+					//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, -offset_vert, 0));
+					mat4.translate(mat_cab, mat_cab, centro_inv);
+					cabin.applyMatrix(mat_cab);
+					
+					cabinas.add(cabin);
+					//ruedas.add(cabin);
+				}
+				
+				
+				bolt = new Mesh( new Cilindro() );
+				mat_bolt = mat4.create();
+				mat4.translate(mat_bolt, mat_bolt, vec3.fromValues(0, 0, 0));
+				mat4.rotate(mat_bolt, mat_bolt, Math.PI/2, vec3.fromValues(0, 1, 0));
+				mat4.scale(mat_bolt, mat_bolt, vec3.fromValues(0.35, 0.35, 3.5));
+				bolt.applyMatrix(mat_bolt);
+				bolt.setColor(Color.WHITE);
+				ruedas.add(bolt);
+				//ruedas_y_soportes.add(bolt);
+				
+				return [ruedas, ruedas_y_soportes];
 			}
 			
             function setupBuffers()
             {
-				una_cabina = cabina();
+				temp = ruedas_y_vigas();
+				ruedas = temp[0];
+				vuelta_al_mundo = temp[1];
             }
             
             function drawScene()
@@ -508,10 +430,10 @@
                 // Preparamos una matriz de modelo+vista.
 				var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
                 mat4.identity(mvMatrix);
-                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0]);
-				mat4.rotate(mvMatrix, mvMatrix, Math.PI/2, [0.0, 1, 0.0]);
+                mat4.translate(mvMatrix, mvMatrix, [0.0, .0, -15.0]);
+				mat4.rotate(mvMatrix, mvMatrix, Math.PI/4, [0.0, 1, 0.0]);
 				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/3, [0.0, 0.0, 1.0]);
-				mat4.rotate(mvMatrix, mvMatrix, t/2, [0.0, 1.0, 0.0]);
+				//mat4.rotate(mvMatrix, mvMatrix, t/2, [0.0, 1.0, 0.0]);
 				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/3, [0.0, 0.0, 1.0]);
 				//mat4.lookAt(mvMatrix, (0, 0, -10), (0, 0, 0), (0, 1, 0));
 				//mat4.rotate(mvMatrix, mvMatrix, t, [0.0, 1.0, 0.0]);
@@ -519,8 +441,42 @@
 				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
 				
 				// Transformaciones a los modelos
+				
+				// rotacion de la rueda y cabinas
 				m1 = mat4.create();
-				una_cabina.render();
+				mat4.rotate(m1, m1, t/4, vec3.fromValues(1, 0, 0));
+				
+				m1_inv = mat4.create();
+				mat4.rotate(m1_inv, m1_inv, -t/4, vec3.fromValues(1, 0, 0));
+				for(var i = 0; i < 8; ++i){
+					var cabina = cabinas.get(i);
+					
+					// muevo cabina a (0,0,0)
+					var centro = cabina.getCenter();
+					var mat_c = mat4.create();
+					var centro_inv = vec3.clone(centro);
+					vec3.scale(centro_inv, centro_inv, -1);
+					mat4.translate(mat_c, mat_c, centro_inv);
+					cabina.applyMatrix(mat_c);
+					
+					var mat_r = mat4.create();
+					
+					// esto hace q se tambaleen las cabinas
+					var diff = 0.15*Math.sin(centro[2]);
+					mat4.rotate(mat_r, mat_r, diff, vec3.fromValues(1, 0, 0));
+					
+					// esto endereza la cabina (pq para la rotacion de la rueda no estoy en el (0,0,0)
+					mat4.rotate(mat_r, mat_r, -t/4, vec3.fromValues(1, 0, 0)); 
+					cabina.setTransform(mat_r);
+					
+					// vuelvo cabina a donde estaba
+					mat_c = mat4.create();
+					mat4.translate(mat_c, mat_c, centro);
+					cabina.applyMatrix(mat_c);
+				}
+				ruedas.setTransform(m1);
+				
+				vuelta_al_mundo.render();
             }
 
         </script>

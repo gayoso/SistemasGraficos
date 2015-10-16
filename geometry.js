@@ -153,6 +153,15 @@ Geometry.prototype = {
 		}				
 	},
 	
+	setColor: function(color){
+		for(var i = 0; i < this.color_buffer.length; i+=3){
+			this.color_buffer.splice(i, 3, color[0], color[1], color[2]);
+			/*this.color_buffer[i] = color[0];
+			this.color_buffer[i+1] = color[1];
+			this.color_buffer[i+2] = color[2];*/
+		}
+	},
+	
 	// Esta función crea e incializa los buffers dentro del pipeline para luego
 	// utlizarlos a la hora de renderizar.
 	setupWebGLBuffers: function(){
@@ -193,7 +202,7 @@ Geometry.prototype = {
 		gl.enableVertexAttribArray(vertexColorAttribute);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_color_buffer);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
 		
 		//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);
