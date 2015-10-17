@@ -18,21 +18,13 @@ var Cabina = function(color){
 Cabina.prototype = Object.create(Conjunto.prototype);
 Cabina.prototype.constructor = Cabina;
 
-// POR SI ALGO NO ANDA, ACA ESTA HARDCODEADO QUE EL CENTRO DE LA CABINA ES EL PUNTO '3' DEL TRIANGULO '1' DEL TECHO
+// POR SI ALGO NO ANDA, ACA ESTA HARDCODEADO QUE EL CENTRO DE LA CABINA ES EL PUNTO '3' DEL TRIANGULO '1' DEL TECHO (es el punto mas alto del techo)
 Cabina.prototype.getCenter = function(){
 	var cabina = this.children[0];
 	var paredes_techo = cabina.get(0);
 	var techo = paredes_techo.get(1);
 	var geom_triang = techo.get(4).geometry;
 	return vec3.fromValues(geom_triang.position_buffer[6], geom_triang.position_buffer[7], geom_triang.position_buffer[8]);
-	
-	/*var centro = this.geometry.getCenter();
-	if(this.children.length > 0){
-		var hijos_centro = Conjunto.prototype.getCenter.call(this);
-		vec3.add(centro, centro, hijos_centro);
-		vec3.scale(centro, centro, 0.5);
-	}
-	return centro;*/
 }
 
 Cabina.cabina = function(paredes_techo, piso){

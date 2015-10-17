@@ -35,6 +35,10 @@ Geometry.prototype = {
 		this.setupWebGLBuffers();
 	},
 	
+	moveVertex: function(i, x, y, z){
+		this.position_buffer.splice(i, 3, x, y, z);
+	},
+
 	// aplica la matriz que se quiere, y multiplica la ultima inversa por la inversa de la nueva transformacion
 	// (chequear, no lo probe asi que no se si anda, o la multiplicacion va al reves)
 	applyMatrix: function(matrix) {

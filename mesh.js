@@ -20,11 +20,9 @@ Mesh.prototype.updateMatrix = function(){
 	this.geometry.setTransform(this.matrix_total);
 };
 
-/*// vuelve al estado inicial todos los vertices, aplica la transf y propaga los cambios a sus hijos
-Mesh.prototype.setTransform = function(m){
-	mat4.copy(this.matrix_local, m);
-	this.updateMatrix();
-},*/
+Mesh.prototype.moveVertex = function(i, x, y, z){
+	this.geometry.moveVertex(i, x, y, z);
+};
 
 Mesh.prototype.render = function(){
 	this.geometry.drawVertexGrid();
