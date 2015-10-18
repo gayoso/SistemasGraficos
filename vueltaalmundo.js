@@ -22,35 +22,19 @@ VueltaAlMundo.prototype.constructor = VueltaAlMundo;
 VueltaAlMundo.prototype.girar = function(){
 
 	var m1 = mat4.create();
-	mat4.rotate(m1, m1, this.timer.elapsed_seconds()/4, vec3.fromValues(1, 0, 0));
+	mat4.rotate(m1, m1, this.timer.elapsed_seconds()/3, vec3.fromValues(1, 0, 0));
 	
 	var m1_inv = mat4.create();
 	mat4.rotate(m1_inv, m1_inv, -this.timer.elapsed_seconds()/4, vec3.fromValues(1, 0, 0));
 	for(var i = 0; i < 8; ++i){
 		var cabina = this.cabinas.get(i);
+		mat_cab = mat4.create();
 		
-		// muevo cabina a (0,0,0)
 		var centro = cabina.getCenter();
-		var mat_c = mat4.create();
-		var centro_inv = vec3.clone(centro);
-		vec3.scale(centro_inv, centro_inv, -1);
-		mat4.translate(mat_c, mat_c, centro_inv);
-		cabina.applyMatrix(mat_c);
-		
-		var mat_r = mat4.create();
-		
-		// esto hace q se tambaleen las cabinas
+		mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, 4.9*Math.sin((1+2*i)*Math.PI/8-this.timer.elapsed_seconds()/3), 4.9*Math.cos((1+2*i)*Math.PI/8-this.timer.elapsed_seconds()/3)));
 		var diff = 0.15*Math.sin(centro[2]);
-		mat4.rotate(mat_r, mat_r, diff, vec3.fromValues(1, 0, 0));
-		
-		// esto endereza la cabina (pq para la rotacion de la rueda no estoy en el (0,0,0)
-		mat4.rotate(mat_r, mat_r, -this.timer.elapsed_seconds()/4, vec3.fromValues(1, 0, 0)); 
-		cabina.setTransform(mat_r);
-		
-		// vuelvo cabina a donde estaba
-		mat_c = mat4.create();
-		mat4.translate(mat_c, mat_c, centro);
-		cabina.applyMatrix(mat_c);
+		mat4.rotate(mat_cab, mat_cab, diff, vec3.fromValues(1, 0, 0));
+		cabina.setTransform(mat_cab);
 	}
 	this.lo_que_gira.setTransform(m1);
 }
@@ -188,7 +172,7 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	
 	// cabinas y soportes horizontales
 	cabinas = new Conjunto();
-	ruedas.add(cabinas);
+	//ruedas.add(cabinas);
 	
 	var colores_cabinas = [ Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, 
 							Color.CYAN, Color.BLUE, Color.MED_PURPLE, Color.PINK]
@@ -204,35 +188,15 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 		viga_temp.applyMatrix(mat_hor_1);
 		viga_temp.setColor(Color.WHITE);
 		ruedas.add(viga_temp);
-		//ruedas_y_soportes.add(viga_temp);
 		
 		var cabin = new Cabina(colores_cabinas[i]);
 		var mat_cab = mat4.create();
-		var offset_vert = 4.7;
 		
-		/*var mat_cambiar_eje = mat4.create();
-		mat4.translate(mat_cambiar_eje, mat_cambiar_eje, vec3.fromValues(0, -1.5, 0));
-		cabin.applyMatrix(mat_cambiar_eje);*/
-		
-		mat4.rotate(mat_cab, mat_cab, (1+2*i)*Math.PI/8, vec3.fromValues(1, 0, 0));
-		mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, 0, -4.9));
+		// las cabinas quedan en el medio, las voy rotando despues en girar
 		mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
-		//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, -offset_vert, 0));
-		cabin.applyMatrix(mat_cab);
-		
-		var centro = cabin.getCenter();
-		var centro_inv = vec3.clone(centro);
-		vec3.scale(centro_inv, centro_inv, -1);
-		mat_cab = mat4.create();
-		//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, offset_vert, 0));
-		mat4.translate(mat_cab, mat_cab, centro);
-		mat4.rotate(mat_cab, mat_cab, -(1+2*i)*Math.PI/8, vec3.fromValues(1, 0, 0));
-		//mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, -offset_vert, 0));
-		mat4.translate(mat_cab, mat_cab, centro_inv);
 		cabin.applyMatrix(mat_cab);
 		
 		cabinas.add(cabin);
-		//ruedas.add(cabin);
 	}
 	
 	
@@ -244,7 +208,7 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	bolt.applyMatrix(mat_bolt);
 	bolt.setColor(Color.WHITE);
 	ruedas.add(bolt);
-	//ruedas_y_soportes.add(bolt);
+	ruedas_y_soportes.add(cabinas);
 	
 	return [cabinas, ruedas, ruedas_y_soportes];
 }
