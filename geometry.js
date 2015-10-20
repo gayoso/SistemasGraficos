@@ -3,7 +3,7 @@ GEOMETRY
 Esta clase representa un objeto (por ahora cilindro, plano o esfera) que se dibuja en pantalla
 ****************************************/
 
-var Geometry = function(/*_rows, _cols,*/ _gridType) {
+var Geometry = function() {
 	
 	if(this.constructor == Geometry){
 		throw new Error("Geometry es abstracta, instanciar una figura particular");
@@ -28,6 +28,18 @@ var Geometry = function(/*_rows, _cols,*/ _gridType) {
 
 Geometry.prototype = {
 	constructor: Geometry,
+	
+	clone: function(geom){
+		if(this.constructor == Geometry){
+			throw new Error("Geometry es abstracta, no se puede clonar");
+		}
+		var clon = new this.constructor();
+		clon.position_buffer = this.position_buffer.slice(0);
+		clon.color_buffer = this.color_buffer.slice(0);
+		//clon.index_buffer = this.index_buffer.slice(0);
+		clon.last_matrix = mat4.clone(this.last_matrix);
+		return clon;
+	},
 	
 	init: function(){
 		this.createGrid();
@@ -154,15 +166,21 @@ Geometry.prototype = {
 				i+=i_add;
 				j+=j_add;
 			}
-		}				
+		} else if(this.draw_mode == gl.LINE_STRIP){
+			/*for(var i = 0; i < this.position_buffer.length; i+=3){
+				this.index_buffer.push(i/3);
+			}*/
+			for(var i = 0; i < this.rows; i++){
+				for(var j = 0; j < this.cols; j++){
+					this.index_buffer.push(i);
+				}
+			}
+		}
 	},
 	
 	setColor: function(color){
 		for(var i = 0; i < this.color_buffer.length; i+=3){
 			this.color_buffer.splice(i, 3, color[0], color[1], color[2]);
-			/*this.color_buffer[i] = color[0];
-			this.color_buffer[i+1] = color[1];
-			this.color_buffer[i+2] = color[2];*/
 		}
 	},
 	

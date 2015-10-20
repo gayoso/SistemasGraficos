@@ -3,7 +3,7 @@ var Cilindro = function(){
 	this.setRows();
 	this.setCols();
 	
-	Geometry.call(this, this.gridType);
+	Geometry.call(this);
 	this.init();
 }
 

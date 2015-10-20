@@ -16,6 +16,18 @@ Conjunto.prototype = {
 
 	constructor: Conjunto,
 	
+	clone: function(){		
+		var clon = new this.constructor();
+		clon.matrix_local = mat4.clone(this.matrix_local);
+		clon.matrix_total = mat4.clone(this.matrix_total);
+		if(this.parent !== null)
+			this.parent.add(clon);
+		for(var i = 0; i < this.children.length; i++){
+			clon.add(this.children[i].clone());
+		}
+		return clon;
+	},
+	
 	// modifica los vertices segun una matriz de escala+rotacion+traslacion
 	applyMatrix: function(m){
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
@@ -54,6 +66,8 @@ Conjunto.prototype = {
 	
 	// agrega un hijo (y me agrego como padre en el hijo)
 	add: function(object){
+		if(object.parent !== null)
+			object.parent.remove(object);
 		object.parent = this;
 		this.children.push(object);
 	},

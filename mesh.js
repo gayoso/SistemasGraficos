@@ -14,6 +14,12 @@ var Mesh = function(geometry){
 Mesh.prototype = Object.create(Conjunto.prototype);
 Mesh.prototype.constructor = Mesh;
 
+Mesh.prototype.clone = function(){
+	var clon = Conjunto.prototype.clone.call(this);
+	clon.geometry = this.geometry.clone();
+	return clon;
+}
+
 Mesh.prototype.updateMatrix = function(){
 	Conjunto.prototype.updateMatrix.call(this);
 	

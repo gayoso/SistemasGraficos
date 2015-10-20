@@ -25,11 +25,14 @@
 		<script type="text/javascript" src="prismahexagonal.js"></script>
 		<script type="text/javascript" src="prismatriangular.js"></script>
 		<script type="text/javascript" src="esfera.js"></script>
+		<script type="text/javascript" src="curva.js"></script>
 		<script type="text/javascript" src="conjunto.js"></script>
 		<script type="text/javascript" src="mesh.js"></script>
 		<script type="text/javascript" src="cabina.js"></script>
 		<script type="text/javascript" src="vueltaalmundo.js"></script>
 		<script type="text/javascript" src="sillasgiratorias.js"></script>
+		<script type="text/javascript" src="track.js"></script>
+		<script type="text/javascript" src="curvedgeometry.js"></script>
         <!--
         Vertex shader
 
@@ -207,7 +210,7 @@
 			
             function setupBuffers()
             {
-				vuelta_al_mundo = new VueltaAlMundo();
+				/*vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
 				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
 				mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
@@ -219,7 +222,52 @@
 				mat4.translate(m2, m2, vec3.fromValues(5, -10, 10));
 				mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
-				sillas_giratorias.setTransform(m2);
+				sillas_giratorias.setTransform(m2);*/
+				
+				var puntos = [];
+				puntos.push(vec3.fromValues(5, 2, 0));
+				puntos.push(vec3.fromValues(5, 2, 4));
+				puntos.push(vec3.fromValues(5, 3, 5.5));
+				puntos.push(vec3.fromValues(5, 4, 7));
+				// giros horizontales
+				puntos.push(vec3.fromValues(5, 6, 8));
+				puntos.push(vec3.fromValues(7, 6.5, 10));
+				puntos.push(vec3.fromValues(8, 6.25, 9.5));
+				puntos.push(vec3.fromValues(8.5, 6, 9));
+				puntos.push(vec3.fromValues(8, 6, 8.5));
+				puntos.push(vec3.fromValues(7.5, 6, 9));
+				puntos.push(vec3.fromValues(8, 5.75, 9.5));
+				puntos.push(vec3.fromValues(8.5, 5.5, 9));
+				puntos.push(vec3.fromValues(8, 5.25, 8.5));
+				puntos.push(vec3.fromValues(7.5, 5.25, 9));
+				puntos.push(vec3.fromValues(8, 5.25, 9.5));
+				puntos.push(vec3.fromValues(8.5, 5, 9));
+				// end
+				puntos.push(vec3.fromValues(8.5, 4.5, 8));
+				puntos.push(vec3.fromValues(8.75, 3, 5));
+				puntos.push(vec3.fromValues(9, 5, 3));
+				puntos.push(vec3.fromValues(8.8, 7, 4));
+				puntos.push(vec3.fromValues(8.6, 5, 5));
+				puntos.push(vec3.fromValues(8.5, 3, 4));
+				puntos.push(vec3.fromValues(8.3, 3, 2));
+				puntos.push(vec3.fromValues(8, 2.5, 0.5));
+				puntos.push(vec3.fromValues(5, 2, 0));
+				
+				curva1 = new Mesh( new Curva(puntos, 1) );
+				var m1 = mat4.create();
+				var centro = curva1.getCenter();
+				vec3.scale(centro, centro, -1);
+				mat4.translate(m1, m1, centro);
+				curva1.applyMatrix(m1);
+				//curva1.setColor(Color.RED);
+				
+				/*track = new Track();
+				
+				var p0 = vec3.fromValues(0, 0, 0);
+				var p1 = vec3.fromValues(4, 0, 0);
+				track.fitToSegment(p0, p1);
+				
+				curva2 = new CurvedGeometry(puntos, new Track());*/
             }
             
             function drawScene()
@@ -234,23 +282,30 @@
                 // Preparamos una matriz de modelo+vista.
 				var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
                 mat4.identity(mvMatrix);
-                mat4.translate(mvMatrix, mvMatrix, [0.0, -5.0, -50.0]);
-				mat4.rotate(mvMatrix, mvMatrix, -Math.PI/2, [0.0, 1, 0.0]);
+                mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -40.0]);
+				mat4.rotate(mvMatrix, mvMatrix, Math.PI/2, [0.0, 1, 0.0]);
+				mat4.rotate(mvMatrix, mvMatrix, Math.PI/8, [0.0, 0, 1.0]);
 				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/8, [0.0, 0.0, 1.0]);
-				//mat4.rotate(mvMatrix, mvMatrix, t/8, [0.0, 1.0, 0.0]);
+				//mat4.rotate(mvMatrix, mvMatrix, t/32, [0.0, 1.0, 0.0]);
 				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/3, [0.0, 0.0, 1.0]);
-				//mat4.lookAt(mvMatrix, (0, 0, -15), (0, 0, 0), (0, 1, 0));
+				//mat4.lookAt(mvMatrix, (0, 0, 0), (1, -1, 0), (0, 1, 0));
 				//mat4.rotate(mvMatrix, mvMatrix, t, [0.0, 1.0, 0.0]);
                 t = t + 0.1;
 				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
 				
 				// Transformaciones a los modelos
-				vuelta_al_mundo.girar();				
-				sillas_giratorias.girar();
+				/*vuelta_al_mundo.girar();				
+				sillas_giratorias.girar();*/
+				var m1 = mat4.create();
+				mat4.rotate(m1, m1, t/8, vec3.fromValues(0, 1, 0));
+				//curva.setTransform(m1);
 				
 				// Dibujar modelos
-				vuelta_al_mundo.render();
-				sillas_giratorias.render();
+				//vuelta_al_mundo.render();
+				//sillas_giratorias.render();
+				curva1.render();
+				//track.render();
+				//curva2.render();
             }
 
         </script>

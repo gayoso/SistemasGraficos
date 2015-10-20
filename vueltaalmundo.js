@@ -1,3 +1,7 @@
+/****************************************
+VUELTA AL MUNDO
+Llamar con new para crear el modelo, y llamar a girar para actualizar la rotacion
+****************************************/
 
 var VueltaAlMundo = function(){
 	Conjunto.call(this);
