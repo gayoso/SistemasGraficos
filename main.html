@@ -151,6 +151,8 @@
                     setupWebGL();
                     initShaders();
                     setupBuffers();
+					// esta es una funcion de javascript que llama a drawScene cada 10 segundos
+					// tal vez cambiar por gl.requestAnimationFrame(drawScene), que llamaria a drawScene cada vez que webgl pide dibujar
                     setInterval(drawScene, 10);  
                 }else{    
                     alert(  "Error: Your browser does not appear to support WebGL.");
@@ -210,6 +212,8 @@
 			
             function setupBuffers()
             {
+				/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
+				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
 				/*vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
 				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
@@ -224,6 +228,8 @@
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 				sillas_giratorias.setTransform(m2);*/
 				
+				/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
+				// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
 				var puntos = [];
 				puntos.push(vec3.fromValues(5, 2, 0));
 				puntos.push(vec3.fromValues(5, 2, 4));
@@ -253,27 +259,36 @@
 				puntos.push(vec3.fromValues(8, 2.5, 0.5));
 				puntos.push(vec3.fromValues(5, 2, 0));
 				
-				curva1 = new Mesh( new Curva(puntos, 1) );
+				/*** DESCOMENTAR ESTO PARA CREAR UNA CURVA ***/
+				curva1 = new Mesh( new Curva(puntos) );
 				var m1 = mat4.create();
 				var centro = curva1.getCenter();
 				vec3.scale(centro, centro, -1);
 				mat4.translate(m1, m1, centro);
 				curva1.applyMatrix(m1);
-				//curva1.setColor(Color.RED);
 				
+				/*** DESCOMENTAR ESTO PARA CREAR EL MODELO DE TRACK ***/
+				// Track tiene un modelo de riel para la montaña rusa, pero no logre hacer que funcione bien
+				// la idea era definir en curva que arme la curva aproximando con rectas de largo predefinido
+				// asi le pasaba el largo del modelo este, y despues era cuestion de ponerlo en cada lugar y orientarlo
 				/*track = new Track();
 				
 				var p0 = vec3.fromValues(0, 0, 0);
 				var p1 = vec3.fromValues(4, 0, 0);
-				track.fitToSegment(p0, p1);
+				// esta funcion deberia trasladar el riel al punto p0, y orientarlo segun el vector p0p1
+				// crei que estaba bien hecho, pero cuando lo pruebo en curva2 queda horrible y no alineado
+				track.fitToSegment(p0, p1);*/
 				
-				curva2 = new CurvedGeometry(puntos, new Track());*/
+				/*** DESCOMENTAR PARA CREAR CURVA CON TRACKS (anda para el orto y puede que se laguee banda) ***/
+				curva2 = new CurvedGeometry(puntos, new Track());
             }
             
             function drawScene()
             {
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                
+				
+				// esto estaba aca en el ejemplo de clase, pero creo que podria ir en otro lado
+				
                 // Preparamos una matriz de perspectiva.
 				var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
                 mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100.0);
@@ -285,26 +300,26 @@
                 mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -40.0]);
 				mat4.rotate(mvMatrix, mvMatrix, Math.PI/2, [0.0, 1, 0.0]);
 				mat4.rotate(mvMatrix, mvMatrix, Math.PI/8, [0.0, 0, 1.0]);
-				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/8, [0.0, 0.0, 1.0]);
-				//mat4.rotate(mvMatrix, mvMatrix, t/32, [0.0, 1.0, 0.0]);
-				//mat4.rotate(mvMatrix, mvMatrix, -Math.PI/3, [0.0, 0.0, 1.0]);
-				//mat4.lookAt(mvMatrix, (0, 0, 0), (1, -1, 0), (0, 1, 0));
-				//mat4.rotate(mvMatrix, mvMatrix, t, [0.0, 1.0, 0.0]);
+
                 t = t + 0.1;
 				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
 				
 				// Transformaciones a los modelos
+				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS GIREN ***/
+				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
 				/*vuelta_al_mundo.girar();				
 				sillas_giratorias.girar();*/
-				var m1 = mat4.create();
-				mat4.rotate(m1, m1, t/8, vec3.fromValues(0, 1, 0));
-				//curva.setTransform(m1);
 				
 				// Dibujar modelos
-				//vuelta_al_mundo.render();
-				//sillas_giratorias.render();
+				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS SE DIBUJEN ***/
+				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
+				/*vuelta_al_mundo.render();
+				//sillas_giratorias.render();*/
+			
 				curva1.render();
+				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE UN TRACK ***/
 				//track.render();
+				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE LA CURVA CON TRACK ***/
 				//curva2.render();
             }
 

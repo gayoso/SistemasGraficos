@@ -85,6 +85,7 @@ Curva.prototype.createCurveGrid = function(){
 		// p es el paso que quiero usar, es fijo porque la idea es extender un cuerpo sobre la curva
 		// para que el cuerpo no se deforme, se define su largo fijo p
 		var p = (this.paso === undefined)? 1 : this.paso;
+		//var p =100;
 		// veo cuantos segmentos de dicho largo entran en la curva
 		var cant = largo / p;
 		// agrego el punto representando a cada segmento
@@ -125,7 +126,9 @@ Curva.prototype.createCurveGrid = function(){
 }
 
 Curva.prototype.putSlice = function(bezier_point, color){
-	this.putSliceCircular(bezier_point, color);
+	// por ahora dejo esto asi, si se cambia por putSliceCuadrada o putSliceCircular en vez de poner puntos hace rectangulos o cilindros
+	// pero si quisieramos esa funcionalidad habria que hacer clases que hereden de aca y usen la que corresponda
+	this.putSlicePunto(bezier_point, color);
 }
 
 Curva.prototype.putSlicePunto = function(bezier_point, color){

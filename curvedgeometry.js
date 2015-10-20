@@ -21,18 +21,29 @@ CurvedGeometry.prototype.constructor = CurvedGeometry;
 
 CurvedGeometry.prototype.init = function(){
 	
-	for(var i = 0; i+5 < this.curva.position_buffer.length-1; i += 3){
-		var x1 = this.curva.position_buffer[i];
-		var y1 = this.curva.position_buffer[i+1];
-		var z1 = this.curva.position_buffer[i+2];
+	var x1, y1, z1, x2, y2, z2;
+	
+	var x1 = this.curva.position_buffer[0];
+	var y1 = this.curva.position_buffer[1];
+	var z1 = this.curva.position_buffer[2];
+	
+	for(var i = 0; i+2 < this.curva.position_buffer.length; i += 3){
 		
-		var x2 = this.curva.position_buffer[i+3];
-		var y2 = this.curva.position_buffer[i+4];
-		var z2 = this.curva.position_buffer[i+5];
+		var x2 = this.curva.position_buffer[i];
+		var y2 = this.curva.position_buffer[i+1];
+		var z2 = this.curva.position_buffer[i+2];
+		
+		if(x1 === x2 && y1 === y2 && z1 === z2)
+			continue;
 		
 		var t = this.geometria.clone();
+		// esto creo que esta funcionando mal
 		t.fitToSegment(vec3.fromValues(x1, y1, z1), vec3.fromValues(x2, y2, z2));
 		
-		this.add(t);
+		x1 = x2
+		y1 = y2
+		z1 = z2;
+		
+		//this.add(t);
 	}
 }
