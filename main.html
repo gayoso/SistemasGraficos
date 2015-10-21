@@ -95,7 +95,9 @@
             var mouseDown = false;
   			var lastMouseX = null;
   			var lastMouseY = null;
-  			var puntoMirado = null;
+  			var puntoOjo = null;
+            var puntoMirado = null;
+            var vecArriba = null;
 
 			function handleMouseDown(event) {
 			    mouseDown = true;
@@ -116,16 +118,44 @@
 			    var newY = event.clientY;
 
 			    var deltaX = newX - lastMouseX;
-			    var newRotationMatrix = mat4.create();
-			    mat4.rotate(newRotationMatrix, newRotationMatrix, Math.PI/180.0* deltaX / 10, [0, 1, 0]);
-
 			    var deltaY = newY - lastMouseY;
-			    mat4.rotate(newRotationMatrix, newRotationMatrix, Math.PI/180.0*deltaY / 10, [1, 0, 0]);
+                var deltaP = vec3.create();
+            
+                vec3.subtract(deltaP, puntoOjo, puntoMirado);
 
-			    mat4.multiply(vMatrix, newRotationMatrix, vMatrix);
-			    lastMouseX = newX
+                var matR = mat4.create();
+                
+                mat4.identity(matR);
+                mat4.rotate(matR, matR, deltaX/100, vecArriba);
+                var ejeDeRotacion = vec3.create();
+                vec3.cross(ejeDeRotacion, vecArriba, deltaP);
+                mat4.rotate(matR, matR, deltaY/100, ejeDeRotacion);
+                vec3.transformMat4(deltaP, deltaP, matR);
+                vec3.transformMat4(vecArriba, vecArriba, matR);
+                vec3.add(puntoOjo, deltaP, puntoMirado);
+
+
+                lastMouseX = newX;
 			    lastMouseY = newY;
+
 			}
+
+			function handleMouseWheel(event){
+				var delta;
+				if (event.wheelData){
+					delta = event.wheelData
+				} else if (event.detail){
+					delta = event.detail;
+				}
+
+				var deltaP = vec3.create();
+
+				vec3.subtract(deltaP, puntoOjo, puntoMirado);
+
+				vec3.scale(deltaP, deltaP, delta/10+1);
+				vec3.add(puntoOjo, puntoMirado, deltaP);
+			}
+
 
              // SHADERS FUNCTION
             function getShader(gl, id) {
@@ -179,7 +209,10 @@
                     gl = canvas.getContext("webgl", { preserveDrawingBuffer: true }) || canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });     
                     canvas.onmousedown = handleMouseDown;
                     document.onmouseup = handleMouseUp;
-                    document.onmousemove = handleMouseMove;                  
+                    document.onmousemove = handleMouseMove;   
+                    window.addEventListener('DOMMouseScroll', handleMouseWheel);
+
+
                 }catch(e){
                 }
                                 
@@ -188,7 +221,7 @@
                     setupWebGL();
                     initShaders();
                     setupBuffers();
-					// esta es una funcion de javascript que llama a drawScene cada 10 segundos
+    				// esta es una funcion de javascript que llama a drawScene cada 10 segundos
 					// tal vez cambiar por gl.requestAnimationFrame(drawScene), que llamaria a drawScene cada vez que webgl pide dibujar
                     setInterval(drawScene, 10);  
                 }else{    
@@ -318,6 +351,10 @@
 				
 				/*** DESCOMENTAR PARA CREAR CURVA CON TRACKS (anda para el orto y puede que se laguee banda) ***/
 				curva2 = new CurvedGeometry(puntos, new Track());
+                puntoOjo = vec3.fromValues(-36.8,15.3,0);
+                puntoMirado = vec3.fromValues(0,0,0);
+                vecArriba = vec3.fromValues(-0.38,0.92,0);
+
             }
             
             function drawScene()
@@ -334,7 +371,7 @@
                 // Preparamos una matriz de modelo+vista.
 				var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
                 mat4.identity(mvMatrix);
-				mat4.lookAt(mvMatrix, vec3.fromValues(-36.8,15.3,0), vec3.fromValues(0, 0, 0), vec3.fromValues(-0.38,0.92,0) );
+				mat4.lookAt(mvMatrix, puntoOjo, puntoMirado, vecArriba);
 				mat4.multiply(mvMatrix, vMatrix, mvMatrix);
 
                 t = t + 0.1;
