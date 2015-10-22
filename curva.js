@@ -56,7 +56,8 @@ Curva.prototype.createCurveGrid = function(){
 		var largo = 0;
 		
 		// recorro una vez con un paso arbitrario chico para obtener el largo de la curva
-		for(var t = 0; t < 1.0; t += 0.1){
+		for(var s = 0; s < 10; s += 1){
+			var t = s/10.0;
 			var coef0 = Math.pow(1-t, 3);
 			var coef1 = 3*t*Math.pow(1-t, 2);
 			var coef2 = 3*t*t*(1-t);
@@ -128,7 +129,7 @@ Curva.prototype.createCurveGrid = function(){
 Curva.prototype.putSlice = function(bezier_point, color){
 	// por ahora dejo esto asi, si se cambia por putSliceCuadrada o putSliceCircular en vez de poner puntos hace rectangulos o cilindros
 	// pero si quisieramos esa funcionalidad habria que hacer clases que hereden de aca y usen la que corresponda
-	this.putSlicePunto(bezier_point, color);
+	this.putSliceCircular(bezier_point, color);
 }
 
 Curva.prototype.putSlicePunto = function(bezier_point, color){
