@@ -30,6 +30,7 @@
 		<script type="text/javascript" src="mesh.js"></script>
 		<script type="text/javascript" src="cabina.js"></script>
 		<script type="text/javascript" src="vueltaalmundo.js"></script>
+		<script type="text/javascript" src="montaniarusa.js"></script>
 		<script type="text/javascript" src="sillasgiratorias.js"></script>
 		<script type="text/javascript" src="track.js"></script>
 		<script type="text/javascript" src="curvedgeometry.js"></script>
@@ -286,7 +287,7 @@
             {
 				/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				vuelta_al_mundo = new VueltaAlMundo();
+				/*vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
 				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
 				mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
@@ -298,10 +299,13 @@
 				mat4.translate(m2, m2, vec3.fromValues(5, -10, 10));
 				mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
-				sillas_giratorias.setTransform(m2);
+				sillas_giratorias.setTransform(m2);*/
+
+				montania_rusa = new MontaniaRusa();
 				
 				/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
 				// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
+				/*
 				var puntos = [];
 				puntos.push(vec3.fromValues(5, 2, 0));
 				puntos.push(vec3.fromValues(5, 2, 4));
@@ -330,15 +334,16 @@
 				puntos.push(vec3.fromValues(8.3, 3, 2));
 				puntos.push(vec3.fromValues(8, 2.5, 0.5));
 				puntos.push(vec3.fromValues(5, 2, 0));
+				*/
 				
 				/*** DESCOMENTAR ESTO PARA CREAR UNA CURVA ***/
-				curva1 = new Mesh( new Curva(puntos) );
+				/*curva1 = new Mesh( new Curva(puntos) );
 				var m1 = mat4.create();
 				var centro = curva1.getCenter();
 				vec3.scale(centro, centro, -1);
 				mat4.translate(m1, m1, centro);
 				curva1.applyMatrix(m1);
-				
+				*/
 				/*** DESCOMENTAR ESTO PARA CREAR EL MODELO DE TRACK ***/
 				// Track tiene un modelo de riel para la montaña rusa, pero no logre hacer que funcione bien
 				// la idea era definir en curva que arme la curva aproximando con rectas de largo predefinido
@@ -349,13 +354,14 @@
 				var p1 = vec3.fromValues(4, 0, 0);
 				// esta funcion deberia trasladar el riel al punto p0, y orientarlo segun el vector p0p1
 				// crei que estaba bien hecho, pero cuando lo pruebo en curva2 queda horrible y no alineado
-				track.fitToSegment(p0, p1);*/
+				track.fitToSegment(p0, p1);
 				
 				/*** DESCOMENTAR PARA CREAR CURVA CON TRACKS (anda para el orto y puede que se laguee banda) ***/
-				curva2 = new CurvedGeometry(puntos, new Track());
-                puntoOjo = vec3.fromValues(-36.8,15.3,0);
+				//curva2 = new CurvedGeometry(puntos, new Track());
+                puntoOjo = vec3.fromValues(0,0,-80);
                 puntoMirado = vec3.fromValues(0,0,0);
-                vecArriba = vec3.fromValues(-0.38,0.92,0);
+                //vecArriba = vec3.fromValues(-0.38,0.92,0);
+                vecArriba = vec3.fromValues(0,1,0);
             }
             
             function drawScene()
@@ -382,15 +388,15 @@
 				// Transformaciones a los modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS GIREN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				vuelta_al_mundo.girar();				
-				sillas_giratorias.girar();
+				/*vuelta_al_mundo.girar();				
+				sillas_giratorias.girar();*/
 				
 				// Dibujar modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS SE DIBUJEN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				vuelta_al_mundo.render();
-				sillas_giratorias.render();
-			
+				/*vuelta_al_mundo.render();
+				sillas_giratorias.render();*/
+				montania_rusa.render();
 				//curva1.render();
 				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE UN TRACK ***/
 				//track.render();
