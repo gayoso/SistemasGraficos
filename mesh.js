@@ -23,15 +23,18 @@ Mesh.prototype.clone = function(){
 Mesh.prototype.updateMatrix = function(){
 	Conjunto.prototype.updateMatrix.call(this);
 	
-	this.geometry.setTransform(this.matrix_total);
+	//this.geometry.setTransform(this.matrix_total);
 };
 
 Mesh.prototype.moveVertex = function(i, x, y, z){
 	this.geometry.moveVertex(i, x, y, z);
 };
 
-Mesh.prototype.render = function(){
-	this.geometry.drawVertexGrid();
+Mesh.prototype.render = function(m){
+	var m_final = mat4.create();
+	if(m === undefined) m = mat4.create();
+	mat4.multiply(m_final, m, this.matrix_local);
+	this.geometry.drawVertexGrid(m_final);
 	Conjunto.prototype.render.call(this);
 };
 
@@ -45,12 +48,16 @@ Mesh.prototype.add = function(object){
 
 // modifica los vertices segun una matriz de escala+rotacion+traslacion
 Mesh.prototype.applyMatrix = function(m){
-	this.geometry.applyMatrix(m);
+	//this.geometry.applyMatrix(m);
+	//mat4.multiply(this.matrix_local, m, this.matrix_local);
 	Conjunto.prototype.applyMatrix.call(this, m);
 };
 
-Mesh.prototype.getCenter = function(){
-	var centro = this.geometry.getCenter();
+Mesh.prototype.getCenter = function(m){
+	if(m === undefined) m = mat4.create();
+	var m_final = mat4.create();
+	mat4.multiply(m_final, m, this.matrix_local);
+	var centro = this.geometry.getCenter(m_final);
 	if(this.children.length > 0){
 		var hijos_centro = Conjunto.prototype.getCenter.call(this);
 		vec3.add(centro, centro, hijos_centro);

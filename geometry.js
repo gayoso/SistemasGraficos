@@ -19,6 +19,7 @@ var Geometry = function() {
 	
 	// guardo la inversa de la ultima matriz que aplique para poder recuperar los puntos originales
 	this.last_matrix = mat4.create();
+	this.model_matrix = mat4.create();
 	
 	// cosas de webgl
 	this.webgl_position_buffer = null;
@@ -55,16 +56,17 @@ Geometry.prototype = {
 	// (chequear, no lo probe asi que no se si anda, o la multiplicacion va al reves)
 	applyMatrix: function(matrix) {
 		
-		for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
+		/*for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
 			var vertex = vec3.fromValues(this.position_buffer[i],
 										this.position_buffer[i+1],
 										this.position_buffer[i+2]);
 			vec3.transformMat4(vertex, vertex, matrix);
 			this.position_buffer.splice(i, 3, vertex[0], vertex[1], vertex[2]);
-		}
+		}*/
+		mat4.multiply(this.model_matrix, matrix, this.model_matrix);
 	},
 	
-	getCenter: function() {
+	getCenter: function(m) {
 		var cant_vert = this.position_buffer.length/3.0;
 		var x_centro = 0, y_centro = 0, z_centro = 0;
 		for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
@@ -75,13 +77,19 @@ Geometry.prototype = {
 		x_centro = x_centro / cant_vert;
 		y_centro = y_centro / cant_vert;
 		z_centro = z_centro / cant_vert;
-		return vec3.fromValues(x_centro, y_centro, z_centro);
+		var centro = vec3.fromValues(x_centro, y_centro, z_centro);
+		var centro_mod = vec3.create();
+		if(m === undefined) m = mat4.create();
+		var m_final = mat4.create();
+		mat4.multiply(m_final, m, this.model_matrix);
+		vec3.transformMat4(centro_mod, centro, m_final);
+		return centro_mod;
 	},
 	
 	// multiplica los vertices por la inversa de la ultima matriz que se aplico para volver a los vertices originales
 	// luego aplica la matriz que se quiere, y se guarda su inversa
 	setTransform: function(matrix) {
-		for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
+		/*for ( var i = 0, l = this.position_buffer.length; i < l; i+=3 ) {
 			var vertex = vec3.fromValues(this.position_buffer[i],
 										this.position_buffer[i+1],
 										this.position_buffer[i+2]);
@@ -96,7 +104,8 @@ Geometry.prototype = {
 			vec3.transformMat4(vertex, vertex, matrix);
 			this.position_buffer.splice(i, 3, vertex[0], vertex[1], vertex[2]);
 		}
-		mat4.invert(this.last_matrix, matrix);
+		mat4.invert(this.last_matrix, matrix);*/
+		mat4.copy(this.model_matrix, matrix);
 	},
 	
 	// las clases derivadas deben redefinir esta funcion
@@ -182,6 +191,9 @@ Geometry.prototype = {
 		for(var i = 0; i < this.color_buffer.length; i+=3){
 			this.color_buffer.splice(i, 3, color[0], color[1], color[2]);
 		}
+		//this.webgl_color_buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_color_buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);   
 	},
 	
 	// Esta función crea e incializa los buffers dentro del pipeline para luego
@@ -194,7 +206,7 @@ Geometry.prototype = {
 		// hemos creado.
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_position_buffer);
 		// 3. Cargamos datos de las posiciones en el buffer.
-		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
 
 		// Repetimos los pasos 1. 2. y 3. para la información del color
 		this.webgl_color_buffer = gl.createBuffer();
@@ -212,19 +224,24 @@ Geometry.prototype = {
 
 	// Esta función es la que se encarga de configurar todo lo necesario
 	// para dibujar el VertexGrid.
-	drawVertexGrid: function(){
+	drawVertexGrid: function(m){
 
 		var vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_position_buffer);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
+		
+		var u_model_matrix = gl.getUniformLocation(glProgram, "uMMatrix");
+		var model_matrix_final = mat4.create();
+		mat4.multiply(model_matrix_final, m, this.model_matrix);
+		gl.uniformMatrix4fv(u_model_matrix, false, model_matrix_final);
 
 		var vertexColorAttribute = gl.getAttribLocation(glProgram, "aVertexColor");
 		gl.enableVertexAttribArray(vertexColorAttribute);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_color_buffer);
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
 		
 		//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);

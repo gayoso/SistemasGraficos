@@ -47,6 +47,7 @@
             // Son comunes a todos los vertices involucrados en el dibujado.
             uniform mat4 uMVMatrix;
             uniform mat4 uPMatrix;
+			uniform mat4 uMMatrix;
 
             // Los varying son propiedades que toman valor para cada fragmento a partir
             // de interpolar linealmente entre los valores que se les asigna en cada 
@@ -56,7 +57,7 @@
             void main(void) {
                 // gl_Position es una variable "built-in" de GLSL que es usada para 
                 // almacenar la posición resultante del fragmento.
-                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position = uPMatrix * uMVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
                 vColor = vec4(aVertexColor,1.0);
             }
         </script>
@@ -223,7 +224,8 @@
                     setupBuffers();
     				// esta es una funcion de javascript que llama a drawScene cada 10 segundos
 					// tal vez cambiar por gl.requestAnimationFrame(drawScene), que llamaria a drawScene cada vez que webgl pide dibujar
-                    setInterval(drawScene, 10);  
+                    //setInterval(drawScene, 10); 
+					requestAnimationFrame(drawScene);
                 }else{    
                     alert(  "Error: Your browser does not appear to support WebGL.");
                 }
@@ -284,7 +286,7 @@
             {
 				/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo = new VueltaAlMundo();
+				vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
 				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
 				mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
@@ -296,7 +298,7 @@
 				mat4.translate(m2, m2, vec3.fromValues(5, -10, 10));
 				mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
-				sillas_giratorias.setTransform(m2);*/
+				sillas_giratorias.setTransform(m2);
 				
 				/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
 				// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
@@ -354,11 +356,11 @@
                 puntoOjo = vec3.fromValues(-36.8,15.3,0);
                 puntoMirado = vec3.fromValues(0,0,0);
                 vecArriba = vec3.fromValues(-0.38,0.92,0);
-
             }
             
             function drawScene()
             {
+				requestAnimationFrame(drawScene);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 				
 				// esto estaba aca en el ejemplo de clase, pero creo que podria ir en otro lado
@@ -380,16 +382,16 @@
 				// Transformaciones a los modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS GIREN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo.girar();				
-				sillas_giratorias.girar();*/
+				vuelta_al_mundo.girar();				
+				sillas_giratorias.girar();
 				
 				// Dibujar modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS SE DIBUJEN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo.render();
-				//sillas_giratorias.render();*/
+				vuelta_al_mundo.render();
+				sillas_giratorias.render();
 			
-				curva1.render();
+				//curva1.render();
 				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE UN TRACK ***/
 				//track.render();
 				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE LA CURVA CON TRACK ***/

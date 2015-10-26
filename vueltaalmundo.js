@@ -35,9 +35,11 @@ VueltaAlMundo.prototype.girar = function(){
 		mat_cab = mat4.create();
 		
 		var centro = cabina.getCenter();
+		//mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
 		mat4.translate(mat_cab, mat_cab, vec3.fromValues(0, 4.9*Math.sin((1+2*i)*Math.PI/8-this.timer.elapsed_seconds()/3), 4.9*Math.cos((1+2*i)*Math.PI/8-this.timer.elapsed_seconds()/3)));
 		var diff = 0.15*Math.sin(centro[2]);
 		mat4.rotate(mat_cab, mat_cab, diff, vec3.fromValues(1, 0, 0));
+		mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
 		cabina.setTransform(mat_cab);
 	}
 	this.lo_que_gira.setTransform(m1);
@@ -134,34 +136,30 @@ VueltaAlMundo.soporte = function(){
 	mat4.rotate(mat_soporte, mat_soporte, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_soporte, mat_soporte, vec3.fromValues(2, 7, 0.25));
 	s.applyMatrix(mat_soporte);
-	return s;
+	var s_conj = new Conjunto();
+	s_conj.add(s);
+	return s_conj;
 }
 
 VueltaAlMundo.vuelta_al_mundo = function(){
 	// corro rueda y soporte a izq
 	rueda_izq = VueltaAlMundo.rueda_vigas();
 	soporte_izq = VueltaAlMundo.soporte();
-	rueda_y_soporte_izq = new Conjunto();
-	rueda_y_soporte_izq.add(rueda_izq);
-	rueda_y_soporte_izq.add(soporte_izq);
-	rueda_y_soporte_izq.setColor(Color.WHITE);
 	
 	mat_izq = mat4.create();
 	mat4.translate(mat_izq, mat_izq, vec3.fromValues(-1, 0, 0));
-	rueda_y_soporte_izq.applyMatrix(mat_izq);
+	rueda_izq.applyMatrix(mat_izq);
+	soporte_izq.applyMatrix(mat_izq);
 	
 	// corro rueda y soporte a der
 	rueda_der = VueltaAlMundo.rueda_vigas();
 	soporte_der = VueltaAlMundo.soporte();
-	rueda_y_soporte_der = new Conjunto();
-	rueda_y_soporte_der.add(rueda_der);
-	rueda_y_soporte_der.add(soporte_der);
-	rueda_y_soporte_der.setColor(Color.WHITE);
 	
 	mat_der = mat4.create();
 	mat4.translate(mat_der, mat_der, vec3.fromValues(1, 0, 0));
 	mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(0, 1, 0));
-	rueda_y_soporte_der.applyMatrix(mat_der);
+	rueda_der.applyMatrix(mat_der);
+	soporte_der.applyMatrix(mat_der);
 	
 	// conjunto de lo que va a girar
 	ruedas = new Conjunto();
@@ -172,7 +170,8 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	ruedas_y_soportes = new Conjunto();
 	ruedas_y_soportes.add(ruedas);
 	ruedas_y_soportes.add(soporte_izq);
-	ruedas_y_soportes.add(soporte_der);				
+	ruedas_y_soportes.add(soporte_der);	
+	ruedas_y_soportes.setColor(Color.WHITE);
 	
 	// cabinas y soportes horizontales
 	cabinas = new Conjunto();
@@ -194,11 +193,11 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 		ruedas.add(viga_temp);
 		
 		var cabin = new Cabina(colores_cabinas[i]);
-		var mat_cab = mat4.create();
+		//var mat_cab = mat4.create();
 		
 		// las cabinas quedan en el medio, las voy rotando despues en girar
-		mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
-		cabin.applyMatrix(mat_cab);
+		//mat4.scale(mat_cab, mat_cab, vec3.fromValues(0.5, 0.5, 0.5));
+		//cabin.applyMatrix(mat_cab);
 		
 		cabinas.add(cabin);
 	}
