@@ -128,10 +128,10 @@
                 var matR = mat4.create();
                 
                 mat4.identity(matR);
-                mat4.rotate(matR, matR, deltaX/100, vecArriba);
+                mat4.rotate(matR, matR, -deltaX/100, vecArriba);
                 var ejeDeRotacion = vec3.create();
                 vec3.cross(ejeDeRotacion, vecArriba, deltaP);
-                mat4.rotate(matR, matR, deltaY/100, ejeDeRotacion);
+                mat4.rotate(matR, matR, -deltaY/100, ejeDeRotacion);
                 vec3.transformMat4(deltaP, deltaP, matR);
                 vec3.transformMat4(vecArriba, vecArriba, matR);
                 vec3.add(puntoOjo, deltaP, puntoMirado);
