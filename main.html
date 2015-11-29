@@ -100,6 +100,7 @@
   			var puntoOjo = null;
             var puntoMirado = null;
             var vecArriba = null;
+            var camara = 1;
 
 			function handleMouseDown(event) {
 			    mouseDown = true;
@@ -112,33 +113,60 @@
 			}
 
 			function handleMouseMove(event) {
+				if(camara == 1){
 
-			    if (!mouseDown) {
-			      return;
-			    }
-			    var newX = event.clientX;
-			    var newY = event.clientY;
+				    if (!mouseDown) {
+				      return;
+				    }
+				    var newX = event.clientX;
+				    var newY = event.clientY;
 
-			    var deltaX = newX - lastMouseX;
-			    var deltaY = newY - lastMouseY;
-                var deltaP = vec3.create();
-            
-                vec3.subtract(deltaP, puntoOjo, puntoMirado);
+				    var deltaX = newX - lastMouseX;
+				    var deltaY = newY - lastMouseY;
+	                var deltaP = vec3.create();
+	            
+	                vec3.subtract(deltaP, puntoOjo, puntoMirado);
 
-                var matR = mat4.create();
-                
-                mat4.identity(matR);
-                mat4.rotate(matR, matR, -deltaX/100, vecArriba);
-                var ejeDeRotacion = vec3.create();
-                vec3.cross(ejeDeRotacion, vecArriba, deltaP);
-                mat4.rotate(matR, matR, -deltaY/100, ejeDeRotacion);
-                vec3.transformMat4(deltaP, deltaP, matR);
-                vec3.transformMat4(vecArriba, vecArriba, matR);
-                vec3.add(puntoOjo, deltaP, puntoMirado);
+	                var matR = mat4.create();
+	                
+	                mat4.identity(matR);
+	                mat4.rotate(matR, matR, -deltaX/100, vecArriba);
+	                var ejeDeRotacion = vec3.create();
+	                vec3.cross(ejeDeRotacion, vecArriba, deltaP);
+	                mat4.rotate(matR, matR, -deltaY/100, ejeDeRotacion);
+	                vec3.transformMat4(deltaP, deltaP, matR);
+	                vec3.transformMat4(vecArriba, vecArriba, matR);
+	                vec3.add(puntoOjo, deltaP, puntoMirado);
 
 
-                lastMouseX = newX;
-			    lastMouseY = newY;
+	                lastMouseX = newX;
+				    lastMouseY = newY;
+				}
+				if(camara == 2){
+					var newX = event.clientX;
+				    var newY = event.clientY;
+
+				    var deltaX = newX - lastMouseX;
+				    var deltaY = newY - lastMouseY;
+	                var deltaP = vec3.create();
+	            
+	                vec3.subtract(deltaP, puntoMirado, puntoOjo);
+
+	                var matR = mat4.create();
+	                
+	                mat4.identity(matR);
+	                mat4.rotate(matR, matR, -deltaX/600, vecArriba);
+	                var ejeDeRotacion = vec3.create();
+	                vec3.cross(ejeDeRotacion, vecArriba, deltaP);
+	                mat4.rotate(matR, matR, deltaY/600, ejeDeRotacion);
+	                vec3.transformMat4(deltaP, deltaP, matR);
+	                vec3.transformMat4(vecArriba, vecArriba, matR);
+	                vec3.add(puntoMirado, deltaP, puntoOjo);
+
+
+	                lastMouseX = newX;
+				    lastMouseY = newY;
+				}
 
 			}
 
@@ -156,6 +184,35 @@
 
 				vec3.scale(deltaP, deltaP, delta/10+1);
 				vec3.add(puntoOjo, puntoMirado, deltaP);
+			}
+
+			function handleKeyDown(event){
+				if (String.fromCharCode(event.keyCode) == "C") {
+					camara = (camara + 1) % 3;
+				}
+				if(camara == 2){
+					var deltaP = vec3.create();
+					vec3.subtract(deltaP, puntoOjo, puntoMirado);
+					vec3.normalize(deltaP, deltaP);
+					if (String.fromCharCode(event.keyCode) == "W") {
+						vec3.subtract(puntoOjo, puntoOjo, deltaP);
+						vec3.subtract(puntoMirado, puntoMirado, deltaP);
+					}
+					if (String.fromCharCode(event.keyCode) == "A") {
+						vec3.cross(deltaP, deltaP, vecArriba);
+						vec3.add(puntoOjo, puntoOjo, deltaP);
+						vec3.add(puntoMirado, puntoMirado, deltaP);
+					}
+					if (String.fromCharCode(event.keyCode) == "S") {
+						vec3.add(puntoOjo, puntoOjo, deltaP);
+						vec3.add(puntoMirado, puntoMirado, deltaP);
+					}
+					if (String.fromCharCode(event.keyCode) == "D") {
+						vec3.cross(deltaP, deltaP, vecArriba);
+						vec3.subtract(puntoOjo, puntoOjo, deltaP);
+						vec3.subtract(puntoMirado, puntoMirado, deltaP);
+					}
+				}
 			}
 
 
@@ -211,7 +268,9 @@
                     gl = canvas.getContext("webgl", { preserveDrawingBuffer: true }) || canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });     
                     canvas.onmousedown = handleMouseDown;
                     document.onmouseup = handleMouseUp;
-                    document.onmousemove = handleMouseMove;   
+                    document.onmousemove = handleMouseMove; 
+                    document.onkeydown = handleKeyDown;
+                    document.onkeyup = handleKeyUp;  
                     window.addEventListener('DOMMouseScroll', handleMouseWheel);
 
 
