@@ -60,7 +60,7 @@ Trapecio.prototype.createTrapecioGrid = function(){
 	
 	
 	// otro lado del trapecio
-	for (var i = 0.0; i < this.rows; i++) {
+	/*for (var i = 0.0; i < this.rows; i++) {
 		var dif = i * Math.tan(this.angulo);
 		for (var j = 0.0; j < this.cols; j++) {
 
@@ -86,4 +86,7 @@ Trapecio.prototype.createTrapecioGrid = function(){
 			this.normals_buffer.push(-1);
 		};
 	};
+	
+	this.rows++;
+	this.rows++;*/
 }

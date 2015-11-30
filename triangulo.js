@@ -73,7 +73,7 @@ Triangulo.prototype.createTrianguloGrid = function(){
 	
 	
 	// otro lado del triangulo
-	this.position_buffer.push(0);
+	/*this.position_buffer.push(0);
 	this.position_buffer.push(-0.5);
 	this.position_buffer.push(0);
 	
@@ -111,4 +111,7 @@ Triangulo.prototype.createTrianguloGrid = function(){
 	this.normals_buffer.push(0);
 	this.normals_buffer.push(0);
 	this.normals_buffer.push(-1);
+	
+	this.rows++;
+	this.rows++;*/
 }

@@ -1,4 +1,6 @@
 
+// funca mal, igual no lo usamos
+
 var Cono = function(_factor){
 	this.setRows();
 	this.setCols();
@@ -121,6 +123,8 @@ Cono.prototype.createConeGrid = function(){
 		this.normals_buffer.push(1);
 	}
 	
+	this.rows++;
+	this.rows++;
 	this.rows++;
 	this.rows++;
 };

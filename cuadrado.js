@@ -47,7 +47,7 @@ Cuadrado.prototype.createUniformPlaneGrid = function(){
 	};
 	
 	// otro lado del plano
-	for (var i = 0.0; i < this.rows; i++) { 
+	/*for (var i = 0.0; i < this.rows; i++) { 
 		for (var j = 0.0; j < this.cols; j++) {
 
 			// Para cada vértice definimos su posición
@@ -67,4 +67,7 @@ Cuadrado.prototype.createUniformPlaneGrid = function(){
 			this.normals_buffer.push(-1);
 		};
 	};
+	
+	this.rows++;
+	this.rows++;*/
 };

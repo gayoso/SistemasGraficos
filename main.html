@@ -3,7 +3,7 @@
 <meta content="ISO-8859-1" http-equiv="encoding">
 <html>
     <head>
-        <title>66.71 WebGL FrameWork</title>
+        <title>66.71 Sistemas Graficos: Gayoso - Keklikian</title>
         <style>
             body{ background-color: grey; }
             canvas{ background-color: white; }
@@ -38,11 +38,11 @@
 		<script type="text/javascript" src="light_point.js"></script>
 		<script type="text/javascript" src="light_directional.js"></script>
         <!--
-        Vertex shader
+        Vertex shader con iluminacion
 
         El vertex shader define la posición y forma de cada vertice de cada polígono.
         --> 
-        <script id="shader-vs" type="x-shader/x-vertex">
+        <script id="shader-vs-iluminacion" type="x-shader/x-vertex">
             // Los atributos son características propias de cada vertice.
             attribute vec3 aVertexPosition;
             attribute vec3 aVertexColor;
@@ -73,13 +73,13 @@
         </script>
 
         <!--
-        Fragment shader
+        Fragment shader con iluminacin
 
         Cada pixel en un polígono se llama fragmento. El fragment shader se encarga de
         establecer el color de cada pixel. En este caso, asignamos el color blanco a 
         cada pixel.
         -->
-        <script id="shader-fs" type="x-shader/x-fragment">
+        <script id="shader-fs-iluminacion" type="x-shader/x-fragment">
 			precision highp float;
 			// luces
 			struct PointLight {
@@ -174,6 +174,75 @@
 													uColorSpecular * uKs * specular);
 				}
 				gl_FragColor = vec4(color, 1.0);
+			}
+        </script>
+		
+		<!--
+        Vertex shader pelado
+
+        El vertex shader define la posición y forma de cada vertice de cada polígono.
+        --> 
+        <script id="shader-vs" type="x-shader/x-vertex">
+            // Los atributos son características propias de cada vertice.
+            attribute vec3 aVertexPosition;
+            attribute vec3 aVertexColor;
+			attribute vec3 aVertexNormal;
+
+            // Los uniforms son características propias de una etapa de dibujado completa.
+            // Son comunes a todos los vertices involucrados en el dibujado.
+			uniform mat4 uMMatrix;
+			uniform mat4 uVMatrix;
+            uniform mat4 uPMatrix;
+			uniform mat4 uNMatrix;
+			
+			varying vColor
+			
+            void main(void) {
+                // gl_Position es una variable "built-in" de GLSL que es usada para 
+                // almacenar la posición resultante del fragmento.
+                gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+                vColor = aVertexColor;
+            }
+        </script>
+
+        <!--
+        Fragment shader pelado
+
+        Cada pixel en un polígono se llama fragmento. El fragment shader se encarga de
+        establecer el color de cada pixel. En este caso, asignamos el color blanco a 
+        cada pixel.
+        -->
+        <script id="shader-fs" type="x-shader/x-fragment">
+			precision highp float;
+			// luces
+			struct PointLight {
+				vec3 position;
+				vec3 ambient;
+				vec3 intensity;
+			};
+			struct DirLight {
+				vec3 direction;
+				vec3 ambient;
+				vec3 intensity;
+			};
+			uniform PointLight pointLights[25];
+			uniform DirLight dirLights[25];
+			uniform float numLights;
+			
+			// material
+			uniform vec3 uViewPos;
+			uniform vec3 uColorSpecular;
+			uniform float uKa;
+			uniform float uKd;
+			uniform float uKs;
+			uniform float uShininess;
+			
+			varying vec3 vColor;
+			varying vec3 vNormal;
+			varying vec3 vertPos;
+			
+			void main() {
+				gl_FragColor = vec4(vColor, 1.0);
 			}
         </script>
 
@@ -402,8 +471,8 @@
             function initShaders()
             {
                 // Obtenemos los shaders ya compilados
-                var fragmentShader = getShader(gl, "shader-fs");
-                var vertexShader = getShader(gl, "shader-vs");
+                var fragmentShader = getShader(gl, "shader-fs-iluminacion");
+                var vertexShader = getShader(gl, "shader-vs-iluminacion");
 
                 // Creamos un programa de shaders de WebGL.
                 glProgram = gl.createProgram();
@@ -445,14 +514,14 @@
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
 				vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
-				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
+				mat4.translate(m1, m1, vec3.fromValues(-20, 17.1, -10));
 				mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m1, m1, vec3.fromValues(4, 4, 4));
 				vuelta_al_mundo.setTransform(m1);
 				
 				sillas_giratorias = new SillasGiratorias();
 				var m2 = mat4.create();
-				mat4.translate(m2, m2, vec3.fromValues(5, -10, 10));
+				mat4.translate(m2, m2, vec3.fromValues(5, -11.99, 10));
 				mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 				sillas_giratorias.setTransform(m2);
@@ -526,11 +595,27 @@
 				// esta es una luz blanca de arriba (de infinito)
 				escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 10.0, 0.0), 
 											vec3.fromValues(1.0, 1.0, 1.0), 
-											vec3.fromValues(0.4, 0.4, 0.4)));
-				// esta es una luz medio turquesa en un costado (sale de donde esta la esfera)
+											vec3.fromValues(1.0, 1.0, 1.0)));
+				// esta es una luz blanca en un costado (sale de donde esta la esfera)
 				escena.addLight(new PointLight(vec3.fromValues(0.0, 0.0, -30.0), 
-											vec3.fromValues(0.5, 0.9, 0.9), 
-											vec3.fromValues(0.1, 0.1, 0.1)));
+											vec3.fromValues(1.0, 1.0, 1.0), 
+											vec3.fromValues(0.0, 0.0, 0.0)));
+				
+				piso = new Mesh( new Circulo() );
+				m_piso = mat4.create();
+				mat4.translate(m_piso, m_piso, vec3.fromValues(0, -15, 0));
+				mat4.rotate(m_piso, m_piso, -Math.PI/2, vec3.fromValues(1, 0, 0));
+				mat4.scale(m_piso, m_piso, vec3.fromValues(200, 200, 200));
+				piso.applyMatrix(m_piso);
+				piso.setColor(Color.FORESTGREEN);
+				escena.addConjunto(piso);
+				
+				cielo = new Mesh( new Esfera() );
+				m_cielo = mat4.create();
+				mat4.scale(m_cielo, m_cielo, vec3.fromValues(500, 500, 500));
+				cielo.applyMatrix(m_cielo);
+				cielo.setColor(Color.SUMMERSKY);
+				escena.addConjunto(cielo);
             }
             
             function drawScene()
@@ -542,7 +627,7 @@
 				
                 // Preparamos una matriz de perspectiva.
 				var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
-                mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100.0);
+                mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100000.0);
                 gl.uniformMatrix4fv(u_proj_matrix, false, pMatrix);
 				
                 // Preparamos una matriz de vista.
