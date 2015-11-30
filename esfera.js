@@ -38,6 +38,10 @@ Esfera.prototype.createSphereGrid = function(){
 		   this.color_buffer.push(1.0/this.rows * i);
 		   this.color_buffer.push(0.2);
 		   this.color_buffer.push(1.0);
+		   
+		   this.normals_buffer.push((x*x+y*y+z*z)*x);
+		   this.normals_buffer.push((x*x+y*y+z*z)*y);
+		   this.normals_buffer.push((x*x+y*y+z*z)*z);
 	   }
 	}
 }

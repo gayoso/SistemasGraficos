@@ -16,15 +16,15 @@ var Geometry = function() {
 	this.position_buffer = [];
 	this.color_buffer = [];
 	this.index_buffer = [];
+	this.normals_buffer = [];
 	
-	// guardo la inversa de la ultima matriz que aplique para poder recuperar los puntos originales
-	this.last_matrix = mat4.create();
 	this.model_matrix = mat4.create();
 	
 	// cosas de webgl
 	this.webgl_position_buffer = null;
 	this.webgl_color_buffer = null;
 	this.webgl_index_buffer = null;
+	this.webgl_normals_buffer = null;
 }
 
 Geometry.prototype = {
@@ -38,7 +38,6 @@ Geometry.prototype = {
 		clon.position_buffer = this.position_buffer.slice(0);
 		clon.color_buffer = this.color_buffer.slice(0);
 		//clon.index_buffer = this.index_buffer.slice(0);
-		clon.last_matrix = mat4.clone(this.last_matrix);
 		return clon;
 	},
 	
@@ -219,6 +218,11 @@ Geometry.prototype = {
 		this.webgl_index_buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
+		
+		// Repetimos los pasos 1. 2. y 3. para la información de las normales
+		this.webgl_normals_buffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_normals_buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals_buffer), gl.STATIC_DRAW);  
 	},
 
 
@@ -236,6 +240,12 @@ Geometry.prototype = {
 		var model_matrix_final = mat4.create();
 		mat4.multiply(model_matrix_final, m, this.model_matrix);
 		gl.uniformMatrix4fv(u_model_matrix, false, model_matrix_final);
+		
+		var u_normals_matrix = gl.getUniformLocation(glProgram, "uNMatrix");
+		var normals_matrix = mat4.create();
+		mat4.invert(normals_matrix, model_matrix_final);
+		mat4.transpose(normals_matrix, normals_matrix);
+		gl.uniformMatrix4fv(u_normals_matrix, false, normals_matrix);
 
 		var vertexColorAttribute = gl.getAttribLocation(glProgram, "aVertexColor");
 		gl.enableVertexAttribArray(vertexColorAttribute);
@@ -243,7 +253,12 @@ Geometry.prototype = {
 		gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
 		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
 		
-		//gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.index_buffer), gl.STATIC_DRAW);
+		var vertexNormalAttribute = gl.getAttribLocation(glProgram, "aVertexNormal");
+		gl.enableVertexAttribArray(vertexNormalAttribute);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_normals_buffer);
+		gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals_buffer), gl.STATIC_DRAW);
+		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);
 
 		// Dibujamos.

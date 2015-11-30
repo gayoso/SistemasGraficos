@@ -168,18 +168,19 @@ Cabina.cabinaParedes = function(pared_grande1, pared_grande2, pared_chica1, pare
 	var mat_grande2 = mat4.create();
 	mat4.translate(mat_grande2, mat_grande2, vec3.fromValues(0, -1.25, 0));
 	mat4.rotate(mat_grande2, mat_grande2, Math.PI/2, vec3.fromValues(0, 0, 1));
+	mat4.rotate(mat_grande2, mat_grande2, Math.PI, vec3.fromValues(0, 0, 1));
 	pared_grande2.applyMatrix(mat_grande2);
 	
 	if(pared_chica1 === undefined) pared_chica1 = Cabina.cabinaParedAngosta();
 	var mat_chica1 = mat4.create();
 	mat4.translate(mat_chica1, mat_chica1, vec3.fromValues(2, 0, 0));
-	//mat4.rotate(mat_chica1, mat_chica1, Math.PI/2, vec3.fromValues(0, 0, 1));
+	//mat4.rotate(mat_chica1, mat_chica1, Math.PI, vec3.fromValues(0, 0, 1));
 	pared_chica1.applyMatrix(mat_chica1);
 	
 	if(pared_chica2 === undefined) pared_chica2 = Cabina.cabinaParedAngosta();
 	var mat_chica2 = mat4.create();
 	mat4.translate(mat_chica2, mat_chica2, vec3.fromValues(-2, 0, 0));
-	//mat4.rotate(mat_chica2, mat_chica2, Math.PI/2, vec3.fromValues(0, 0, 1));
+	mat4.rotate(mat_chica2, mat_chica2, Math.PI, vec3.fromValues(0, 0, 1));
 	pared_chica2.applyMatrix(mat_chica2);
 	
 	var paredes = new Conjunto();
@@ -213,6 +214,7 @@ Cabina.cabinaTecho = function(){
 	mat4.translate(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(-1, 0, 0));
 	mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(4, 0.6, 1));
+	mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI, vec3.fromValues(1, 0, 0));
 	rect_largo_der.applyMatrix(mat_rect_largo_der);
 	
 	var rect_largo_adelante = new Mesh( new Cuadrado() );
@@ -227,6 +229,7 @@ Cabina.cabinaTecho = function(){
 	mat4.translate(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(0, 0, -2));
 	//mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(2, 0.6, 1));
+	mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI, vec3.fromValues(1, 0, 0));
 	rect_largo_atras.applyMatrix(mat_rect_largo_atras);
 	
 	var triang1 = new Mesh( new Triangulo() );
@@ -235,6 +238,7 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_triang1, mat_triang1, Math.PI/2.85, vec3.fromValues(1, 0, 0));
 	mat4.rotate(mat_triang1, mat_triang1, Math.PI/2, vec3.fromValues(0, 0, 1));
 	mat4.scale(mat_triang1, mat_triang1, vec3.fromValues(2.236, 2, 1));
+	mat4.rotate(mat_triang1, mat_triang1, Math.PI, vec3.fromValues(1, 0, 0));
 	triang1.applyMatrix(mat_triang1);
 	
 	var triang2 = new Mesh( new Triangulo() );
@@ -252,6 +256,7 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.rotate(mat_triang3, mat_triang3, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_triang3, mat_triang3, vec3.fromValues(1.414, 4, 1));
+	mat4.rotate(mat_triang3, mat_triang3, Math.PI, vec3.fromValues(1, 0, 0));
 	triang3.applyMatrix(mat_triang3);
 	
 	var triang4 = new Mesh( new Triangulo() );
@@ -310,6 +315,7 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.rotate(mat_der, mat_der, -0.4646, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_der, mat_der, vec3.fromValues(0.558, 4, 1));
 	mat4.translate(mat_der, mat_der, vec3.fromValues(0.5, 0, 0));
+	mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(1, 0, 0));
 	piso_der.applyMatrix(mat_der);
 
 	if(piso_atras === undefined) piso_atras = new Mesh( new Trapecio(7) );
@@ -319,6 +325,7 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.rotate(mat_atras, mat_atras, Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(mat_atras, mat_atras, vec3.fromValues(0.7071, 2, 1));
 	mat4.translate(mat_atras, mat_atras, vec3.fromValues(0.5, 0, 0));
+	mat4.rotate(mat_atras, mat_atras, Math.PI, vec3.fromValues(1, 0, 0));
 	piso_atras.applyMatrix(mat_atras);
 
 	if(piso_adelante === undefined) piso_adelante = new Mesh( new Trapecio(7) );

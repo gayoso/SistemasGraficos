@@ -34,6 +34,9 @@
 		<script type="text/javascript" src="sillasgiratorias.js"></script>
 		<script type="text/javascript" src="track.js"></script>
 		<script type="text/javascript" src="curvedgeometry.js"></script>
+		<script type="text/javascript" src="scene.js"></script>
+		<script type="text/javascript" src="light_point.js"></script>
+		<script type="text/javascript" src="light_directional.js"></script>
         <!--
         Vertex shader
 
@@ -43,23 +46,29 @@
             // Los atributos son características propias de cada vertice.
             attribute vec3 aVertexPosition;
             attribute vec3 aVertexColor;
+			attribute vec3 aVertexNormal;
 
             // Los uniforms son características propias de una etapa de dibujado completa.
             // Son comunes a todos los vertices involucrados en el dibujado.
-            uniform mat4 uMVMatrix;
-            uniform mat4 uPMatrix;
 			uniform mat4 uMMatrix;
+			uniform mat4 uVMatrix;
+            uniform mat4 uPMatrix;
+			uniform mat4 uNMatrix;
 
             // Los varying son propiedades que toman valor para cada fragmento a partir
             // de interpolar linealmente entre los valores que se les asigna en cada 
             // vértice del polígono al cual pertenecen.
-            varying highp vec4 vColor;    
- 
+            varying vec3 vColor;
+			varying vec3 vNormal;
+			varying vec3 vertPos;
+			
             void main(void) {
                 // gl_Position es una variable "built-in" de GLSL que es usada para 
                 // almacenar la posición resultante del fragmento.
-                gl_Position = uPMatrix * uMVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
-                vColor = vec4(aVertexColor,1.0);
+                gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+				vertPos = vec3(uMMatrix * vec4(aVertexPosition, 1.0));
+                vColor = aVertexColor;
+				vNormal = vec3(uNMatrix * vec4(aVertexNormal, 0.0));
             }
         </script>
 
@@ -71,13 +80,101 @@
         cada pixel.
         -->
         <script id="shader-fs" type="x-shader/x-fragment">
-        varying highp vec4 vColor;
+			precision highp float;
+			// luces
+			struct PointLight {
+				vec3 position;
+				vec3 ambient;
+				vec3 intensity;
+			};
+			struct DirLight {
+				vec3 direction;
+				vec3 ambient;
+				vec3 intensity;
+			};
+			uniform PointLight pointLights[25];
+			uniform DirLight dirLights[25];
+			uniform float numLights;
+			
+			// material
+			uniform vec3 uViewPos;
+			uniform vec3 uColorSpecular;
+			uniform float uKa;
+			uniform float uKd;
+			uniform float uKs;
+			uniform float uShininess;
+			
+			varying vec3 vColor;
+			varying vec3 vNormal;
+			varying vec3 vertPos;
+			
+			void main() {
+				vec3 normal = normalize(vNormal);			
+				vec3 viewDir = normalize(vertPos - uViewPos);
+				vec3 color = vec3(0.0, 0.0, 0.0);
+				
+				// point lights
+				for(int i = 0; i < 25; ++i){
+				
+					// cosas que dependen de cada luz
+					vec3 Ia = pointLights[i].ambient; // luz ambiente (cada luz contribuye a esto)
+					vec3 lightPos = pointLights[i].position;
+					vec3 Ip = pointLights[i].intensity; // intensidad de la luz ficticia
+					
+					vec3 lightDir = normalize(lightPos - vertPos);
+					vec3 reflectDir = reflect(-lightDir, normal);
+					// esto es para el factor de atenuacion segun la distancia al observador
+					// constantes (de 0 a 1)
+					float c1 = 0.0;
+					float c2 = 0.02;
+					float c3 = 0.0;
+					float dist_to_light = length(lightPos - vertPos);
+					float fatt = min(1.0 / (c1 + c2*dist_to_light + c3*pow(dist_to_light, 2.0)), 1.0);			
 
-        void main(void) {
-          // gl_FragColor es una variable "built-in" de GLSL que es usada para 
-          // almacenar el color resultante del fragmento.
-          gl_FragColor = vColor;
-        }
+					float lambertian = max(dot(lightDir,normal), 0.0);
+					float specular = 0.0;
+
+					if(lambertian > 0.0) {
+					   float specAngle = max(dot(reflectDir, viewDir), 0.0);
+					   specular = pow(specAngle, uShininess);
+					}
+					
+					color += Ia * vColor * uKa + 
+										(Ip / numLights) * fatt * (vColor * uKd * lambertian + 
+													uColorSpecular * uKs * specular);
+				}
+				
+				// dir lights
+				for(int i = 0; i < 25; ++i){
+				
+					// cosas que dependen de cada luz
+					vec3 Ia = dirLights[i].ambient; // luz ambiente (cada luz contribuye a esto)
+					vec3 Ip = dirLights[i].intensity; // intensidad de la luz ficticia
+					vec3 lightDir = normalize(dirLights[i].direction);
+					
+					vec3 reflectDir = reflect(-lightDir, normal);
+					// esto es para el factor de atenuacion segun la distancia al observador
+					// constantes (de 0 a 1)
+					float c1 = 0.0;
+					float c2 = 0.02;
+					float c3 = 0.0;
+					float dist_to_light = 9.0;
+					float fatt = min(1.0 / (c1 + c2*dist_to_light + c3*pow(dist_to_light, 2.0)), 1.0);			
+
+					float lambertian = max(dot(lightDir,normal), 0.0);
+					float specular = 0.0;
+
+					if(lambertian > 0.0) {
+					   float specAngle = max(dot(reflectDir, viewDir), 0.0);
+					   specular = pow(specAngle, uShininess);
+					}
+					
+					color += Ia * vColor * uKa + 
+										(Ip / numLights) * fatt * (vColor * uKd * lambertian + 
+													uColorSpecular * uKs * specular);
+				}
+				gl_FragColor = vec4(color, 1.0);
+			}
         </script>
 
         <script>
@@ -287,7 +384,7 @@
             {
 				/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo = new VueltaAlMundo();
+				vuelta_al_mundo = new VueltaAlMundo();
 				var m1 = mat4.create();
 				mat4.translate(m1, m1, vec3.fromValues(-20, 15, -10));
 				mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
@@ -299,7 +396,7 @@
 				mat4.translate(m2, m2, vec3.fromValues(5, -10, 10));
 				mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
-				sillas_giratorias.setTransform(m2);*/
+				sillas_giratorias.setTransform(m2);
 
 				montania_rusa = new MontaniaRusa();
 				
@@ -362,6 +459,19 @@
                 puntoMirado = vec3.fromValues(0,0,0);
                 //vecArriba = vec3.fromValues(-0.38,0.92,0);
                 vecArriba = vec3.fromValues(0,1,0);
+				
+				escena = new Scene();
+				escena.addConjunto(vuelta_al_mundo);
+				escena.addConjunto(sillas_giratorias);
+
+				// esta es una luz blanca de arriba (de infinito)
+				escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 10.0, 0.0), 
+											vec3.fromValues(1.0, 1.0, 1.0), 
+											vec3.fromValues(0.4, 0.4, 0.4)));
+				// esta es una luz medio turquesa en un costado (sale de donde esta la esfera)
+				escena.addLight(new PointLight(vec3.fromValues(0.0, 0.0, -30.0), 
+											vec3.fromValues(0.5, 0.9, 0.9), 
+											vec3.fromValues(0.1, 0.1, 0.1)));
             }
             
             function drawScene()
@@ -375,28 +485,32 @@
 				var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
                 mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100.0);
                 gl.uniformMatrix4fv(u_proj_matrix, false, pMatrix);
-
-                // Preparamos una matriz de modelo+vista.
-				var u_model_view_matrix = gl.getUniformLocation(glProgram, "uMVMatrix");
-                mat4.identity(mvMatrix);
-				mat4.lookAt(mvMatrix, puntoOjo, puntoMirado, vecArriba);
-				mat4.multiply(mvMatrix, vMatrix, mvMatrix);
-
+				
+                // Preparamos una matriz de vista.
+				var u_view_matrix = gl.getUniformLocation(glProgram, "uVMatrix");
+                mat4.identity(vMatrix);
+				mat4.lookAt(vMatrix, puntoOjo, puntoMirado, vecArriba);
+				gl.uniformMatrix4fv(u_view_matrix, false, vMatrix);
+				
+				// Preparams la posicion del observador
+				var u_view_dir = gl.getUniformLocation(glProgram, "uViewPos");
+				gl.uniform3fv(u_view_dir, puntoOjo);
+				
                 t = t + 0.1;
-				gl.uniformMatrix4fv(u_model_view_matrix, false, mvMatrix);
 				
 				// Transformaciones a los modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS GIREN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo.girar();				
-				sillas_giratorias.girar();*/
+				vuelta_al_mundo.girar();				
+				sillas_giratorias.girar();
 				
 				// Dibujar modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS SE DIBUJEN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				/*vuelta_al_mundo.render();
-				sillas_giratorias.render();*/
-				montania_rusa.render();
+				//vuelta_al_mundo.render();
+				//sillas_giratorias.render();
+				escena.render();
+				//montania_rusa.render();
 				//curva1.render();
 				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE UN TRACK ***/
 				//track.render();

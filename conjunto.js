@@ -6,7 +6,8 @@ No representa nada que se dibuje, pero dibuja y aplica transformaciones a todos 
 
 var Conjunto = function() {
 	this.matrix_local = mat4.create();
-	this.matrix_total = mat4.create();
+	this.matrix_total = mat4.create(); // no se usa ahora, la dejo x las dudas igual
+	this.matrix_normals_local = mat4.create();
 	this.parent = null;
 	this.children = [];
 	//this.type = 'Conjunto';
@@ -112,6 +113,36 @@ Conjunto.prototype = {
 	setColor: function(color){
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 			this.children[i].setColor(color);
+		}
+	},
+	
+	setColorSpecular: function(color_specular){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setColorSpecular(color_specular);
+		}
+	},
+
+	setKa: function(ka){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setKa(ka);
+		}
+	},
+
+	setKd: function(kd){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setKd(kd);
+		}
+	},
+
+	setKs: function(ks){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setKs(ks);
+		}
+	},
+
+	setShininess: function(shininess){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setShininess(shininess);
 		}
 	}
 }

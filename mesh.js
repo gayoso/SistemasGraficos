@@ -1,18 +1,65 @@
 /****************************************
 MESH
 Esta clase es en definitiva un 'Conjunto' que tiene un objeto 'Geometry'
-(medio sin sentido ahora, pero cuando haya que aplicar texturas van aca)
 ****************************************/
 
-var Mesh = function(geometry){
+var Mesh = function(geometry, ka, kd, ks, shininess, color, color_specular){
 	Conjunto.call(this);
 	
 	this.geometry = geometry;
-	//this.type = 'Mesh';
+	// color del objeto
+	if(color === undefined)
+		color = Color.RED;
+	this.color = color;
+	// color especular de un material u objeto
+	if(color_specular === undefined)
+		color_specular = vec3.fromValues(1.0, 1.0, 1.0);
+	this.color_specular = color_specular;
+	// cte de iluminacion ambiente para cada material
+	if(ka === undefined)
+		ka = 0.2;
+	this.ka = ka;
+	// cte de iluminacion difusa para cada material
+	if(kd === undefined)
+		kd = 0.9;
+	this.kd = kd;
+	// cte de iluminacion especular para cada material
+	if(ks === undefined)
+		ks = 0.2;
+	this.ks = ks;
+	// cte de detalle especular. cuanto mas grande, mas chico el detalle especular
+	if(shininess === undefined)
+		shininess = 64.0;
+	this.shininess = shininess;
 }
 
 Mesh.prototype = Object.create(Conjunto.prototype);
 Mesh.prototype.constructor = Mesh;
+
+Mesh.prototype.setColorSpecular = function(color_specular){
+	Conjunto.prototype.setColorSpecular.call(this);
+	this.color_specular = color_specular;
+}
+
+Mesh.prototype.setKa = function(ka){
+	Conjunto.prototype.setKa.call(this);
+	this.ka = ka;
+}
+
+Mesh.prototype.setKd = function(kd){
+	Conjunto.prototype.setKd.call(this);
+	this.kd = kd;
+}
+
+Mesh.prototype.setKs = function(ks){
+	Conjunto.prototype.setKs.call(this);
+	this.ks = ks;
+}
+
+Mesh.prototype.setShininess = function(shininess){
+	Conjunto.prototype.setShininess.call(this);
+	this.shininess = shininess;
+}
 
 Mesh.prototype.clone = function(){
 	var clon = Conjunto.prototype.clone.call(this);
@@ -34,7 +81,24 @@ Mesh.prototype.render = function(m){
 	var m_final = mat4.create();
 	if(m === undefined) m = mat4.create();
 	mat4.multiply(m_final, m, this.matrix_local);
+	
+	var u_color_specular = gl.getUniformLocation(glProgram, "uColorSpecular");
+	gl.uniform3fv(u_color_specular, this.color_specular);
+	
+	var u_ka = gl.getUniformLocation(glProgram, "uKa");
+	gl.uniform1f(u_ka, this.ka);
+	
+	var u_kd = gl.getUniformLocation(glProgram, "uKd");
+	gl.uniform1f(u_kd, this.kd);
+	
+	var u_ks = gl.getUniformLocation(glProgram, "uKs");
+	gl.uniform1f(u_ks, this.ks);
+	
+	var u_shininess = gl.getUniformLocation(glProgram, "uShininess");
+	gl.uniform1f(u_shininess, this.shininess);
+	
 	this.geometry.drawVertexGrid(m_final);
+	
 	Conjunto.prototype.render.call(this);
 };
 
@@ -67,6 +131,6 @@ Mesh.prototype.getCenter = function(m){
 };
 
 Mesh.prototype.setColor = function(color){
-	//Conjunto.prototype.setColor.call(color);
+	Conjunto.prototype.setColor.call(this);
 	this.geometry.setColor(color);
 };

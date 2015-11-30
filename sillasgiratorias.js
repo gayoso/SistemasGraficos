@@ -56,7 +56,7 @@ SillasGiratorias.prototype.constructor = SillasGiratorias;
 SillasGiratorias.prototype.girar = function(){
 	var time = this.timer.elapsed_seconds() % 60;
 	// velocidad de rotacion, tiene una velocidad base y aumenta y disminuye
-	console.log(time);
+	//console.log(time);
 	var vel_giro, vel_sillas, a, a_sillas, pos_giro, angulo_sillas;
 	if(time <= this.t02){
 		a = this.a_giro;
@@ -82,7 +82,7 @@ SillasGiratorias.prototype.girar = function(){
 		angulo_sillas = x_MRUV(this.ultimo_angulo_sillas, vel_sillas, a_sillas, t);
 		this.ultimo_angulo_sillas = angulo_sillas;
 		
-		console.log("1. vel: %s, pos: %s", vel_sillas, angulo_sillas);
+		//console.log("1. vel: %s, pos: %s", vel_sillas, angulo_sillas);
 	} else if(time >= this.t02 && time < this.t03){
 		a = 0;
 		a_sillas = 0;
@@ -102,7 +102,7 @@ SillasGiratorias.prototype.girar = function(){
 		angulo_sillas = x_MRU(this.ultimo_angulo_sillas, vel_sillas, t);
 		this.ultimo_angulo_sillas = angulo_sillas;
 		
-		console.log("2. vel: %s, pos: %s", vel_sillas, angulo_sillas);
+		//console.log("2. vel: %s, pos: %s", vel_sillas, angulo_sillas);
 	} else if(time >= this.t03){
 		a = -this.a_giro;
 		a_sillas = this.a_sillas;
@@ -122,7 +122,7 @@ SillasGiratorias.prototype.girar = function(){
 		angulo_sillas = x_MRUV(this.ultimo_angulo_sillas, vel_sillas, a_sillas, t);
 		this.ultimo_angulo_sillas = angulo_sillas;
 		
-		console.log("3. vel: %s, pos: %s", vel_sillas, angulo_sillas);
+		//console.log("3. vel: %s, pos: %s", vel_sillas, angulo_sillas);
 	}
 	
 	for(var i = 0; i < 16; i++){
