@@ -10,6 +10,7 @@ var TexturedMesh = function(path_to_texture, mapping_function, geometry/*, repea
 	this.webgl_texture_coords_buffer = null;
 	this.mapping_function = mapping_function;
 	this.texture = null;
+	this.texture_normals = null;
 	
 	//if(repeat === undefined){
 	//	repeat = false;
@@ -30,6 +31,7 @@ TexturedMesh.setupTextureFilteringAndMips = function(width, height, repeat){
 		// tri-linear filtering.
 		gl.generateMipmap(gl.TEXTURE_2D);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+		//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		if(repeat){
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
@@ -44,13 +46,16 @@ TexturedMesh.setupTextureFilteringAndMips = function(width, height, repeat){
 }
 
 TexturedMesh.textures_to_load = new Array;
+TexturedMesh.textures_to_load_names = new Array;
 TexturedMesh.textures_loaded = new Array;
+TexturedMesh.textures_loaded_names = new Array;
 
 TexturedMesh.prototype = Object.create(Mesh.prototype);
 TexturedMesh.prototype.constructor = TexturedMesh;
 
 TexturedMesh.handleLoadedTexture = function(repeat) {
 	var texture = TexturedMesh.textures_to_load.pop();
+	var t_name = TexturedMesh.textures_to_load_names.pop();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
@@ -61,18 +66,67 @@ TexturedMesh.handleLoadedTexture = function(repeat) {
 	TexturedMesh.setupTextureFilteringAndMips(texture.image.width, texture.image.height, repeat);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	TexturedMesh.textures_loaded.push(texture);
+	TexturedMesh.textures_loaded_names.push(t_name);
 };
 
 TexturedMesh.prototype.loadTexture = function(path_to_texture, repeat){
+	var i = TexturedMesh.textures_loaded_names.indexOf(path_to_texture);
+	if(i != -1){
+		this.texture = TexturedMesh.textures_loaded[i];
+		return;
+	}
+	i = TexturedMesh.textures_to_load_names.indexOf(path_to_texture);
+	if(i != -1){
+		this.texture = TexturedMesh.textures_to_load[i];
+		return;
+	}
+	
 	this.texture = gl.createTexture();
 	this.texture.image = new Image();
 	TexturedMesh.textures_to_load.push(this.texture);
+	TexturedMesh.textures_to_load_names.push(path_to_texture);
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255]));
-	this.texture.image.onload = function(repeat) {
-		TexturedMesh.handleLoadedTexture(repeat);
+	if(repeat){
+		this.texture.image.onload = function() {
+			TexturedMesh.handleLoadedTexture(true);
+		}
+	} else {
+		this.texture.image.onload = function() {
+			TexturedMesh.handleLoadedTexture(false);
+		}
 	}
 	this.texture.image.src = path_to_texture;
+};
+
+TexturedMesh.prototype.loadNormalTexture = function(path_to_normal_texture, repeat){
+	var i = TexturedMesh.textures_loaded_names.indexOf(path_to_normal_texture);
+	if(i != -1){
+		this.texture_normals = TexturedMesh.textures_loaded[i];
+		return;
+	}
+	i = TexturedMesh.textures_to_load_names.indexOf(path_to_normal_texture);
+	if(i != -1){
+		this.texture_normals = TexturedMesh.textures_to_load[i];
+		return;
+	}
+	
+	this.texture_normals = gl.createTexture();
+	this.texture_normals.image = new Image();
+	TexturedMesh.textures_to_load.push(this.texture_normals);
+	TexturedMesh.textures_to_load_names.push(path_to_normal_texture);
+	gl.bindTexture(gl.TEXTURE_2D, this.texture_normals);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255]));
+	if(repeat){
+		this.texture_normals.image.onload = function() {
+			TexturedMesh.handleLoadedTexture(true);
+		}
+	} else {
+		this.texture_normals.image.onload = function() {
+			TexturedMesh.handleLoadedTexture(false);
+		}
+	}
+	this.texture_normals.image.src = path_to_normal_texture;
 };
 
 TexturedMesh.prototype.initBuffers = function(){
@@ -120,10 +174,21 @@ TexturedMesh.prototype.render = function(m){
 	gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(glProgram.samplerUniform, 0);
+	gl.uniform1i(gl.getUniformLocation(glProgram, "uSampler"), 0);
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	
+	var u_use_normals = gl.getUniformLocation(glProgram, "uUseNormalMap");
+	if(this.texture_normals != null){
+		gl.uniform1i(u_use_normals, true);
+		
+		gl.activeTexture(gl.TEXTURE1);
+		gl.uniform1i(gl.getUniformLocation(glProgram, "uNormalSampler"), 0);
+		gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	}
+	
 	this.geometry.drawVertexGrid(m_final);
+	gl.disableVertexAttribArray(textureCoordAttribute);
+	gl.uniform1i(u_use_normals, false);
 	
 	Conjunto.prototype.render.call(this);
 };

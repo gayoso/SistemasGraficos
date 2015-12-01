@@ -263,5 +263,8 @@ Geometry.prototype = {
 
 		// Dibujamos.
 		gl.drawElements(this.draw_mode, this.index_buffer.length, gl.UNSIGNED_SHORT, 0);
+		gl.disableVertexAttribArray(vertexPositionAttribute);
+		gl.disableVertexAttribArray(vertexColorAttribute);
+		gl.disableVertexAttribArray(vertexNormalAttribute);
 	}
 }
