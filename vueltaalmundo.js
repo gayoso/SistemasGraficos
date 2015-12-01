@@ -46,53 +46,54 @@ VueltaAlMundo.prototype.girar = function(){
 }
 
 VueltaAlMundo.rueda_vigas = function(){
-	factor_escala = 0.10;
+	var factor_escala1 = 0.10*1.1;
+	var factor_escala2 = 0.10;
 	
-	viga1 = new Mesh( new Cubo() );
-	mat_1 = mat4.create();
-	mat4.scale(mat_1, mat_1, vec3.fromValues(factor_escala, factor_escala, 10));
+	var viga1 = new Mesh( new Cubo() );
+	var mat_1 = mat4.create();
+	mat4.scale(mat_1, mat_1, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga1.applyMatrix(mat_1);
 	
-	viga2 = new Mesh( new Cubo() );
-	mat_2 = mat4.create();
+	var viga2 = new Mesh( new Cubo() );
+	var mat_2 = mat4.create();
 	mat4.rotate(mat_2, mat_2, Math.PI/2, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_2, mat_2, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_2, mat_2, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga2.applyMatrix(mat_2);
 	
-	viga3 = new Mesh( new Cubo() );
-	mat_3 = mat4.create();
+	var viga3 = new Mesh( new Cubo() );
+	var mat_3 = mat4.create();
 	mat4.rotate(mat_3, mat_3, Math.PI/4, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_3, mat_3, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_3, mat_3, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga3.applyMatrix(mat_3);
 	
-	viga4 = new Mesh( new Cubo() );
-	mat_4 = mat4.create();
+	var viga4 = new Mesh( new Cubo() );
+	var mat_4 = mat4.create();
 	mat4.rotate(mat_4, mat_4, -Math.PI/4, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_4, mat_4, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_4, mat_4, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga4.applyMatrix(mat_4);
 	
-	viga5 = new Mesh( new Cubo() );
-	mat_5 = mat4.create();
+	var viga5 = new Mesh( new Cubo() );
+	var mat_5 = mat4.create();
 	mat4.rotate(mat_5, mat_5, -Math.PI/8, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_5, mat_5, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_5, mat_5, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga5.applyMatrix(mat_5);
 	
-	viga6 = new Mesh( new Cubo() );
-	mat_6 = mat4.create();
+	var viga6 = new Mesh( new Cubo() );
+	var mat_6 = mat4.create();
 	mat4.rotate(mat_6, mat_6, Math.PI/8, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_6, mat_6, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_6, mat_6, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga6.applyMatrix(mat_6);
 	
-	viga7 = new Mesh( new Cubo() );
-	mat_7 = mat4.create();
+	var viga7 = new Mesh( new Cubo() );
+	var mat_7 = mat4.create();
 	mat4.rotate(mat_7, mat_7, 3*Math.PI/8, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_7, mat_7, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_7, mat_7, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga7.applyMatrix(mat_7);
 	
-	viga8 = new Mesh( new Cubo() );
-	mat_8 = mat4.create();
+	var viga8 = new Mesh( new Cubo() );
+	var mat_8 = mat4.create();
 	mat4.rotate(mat_8, mat_8, -3*Math.PI/8, vec3.fromValues(1, 0, 0));
-	mat4.scale(mat_8, mat_8, vec3.fromValues(factor_escala, factor_escala, 10));
+	mat4.scale(mat_8, mat_8, vec3.fromValues(factor_escala1, factor_escala1, 10));
 	viga8.applyMatrix(mat_8);
 	
 	//vigas_hor = [];
@@ -107,21 +108,21 @@ VueltaAlMundo.rueda_vigas = function(){
 	vigas.add(viga8);
 	
 	for(i = 0; i < 16; ++i){
-		viga_temp = new Mesh( new Cubo() );
-		mat_hor_1 = mat4.create();
+		var viga_temp = new Mesh( new Cubo() );
+		var mat_hor_1 = mat4.create();
 		mat4.rotate(mat_hor_1, mat_hor_1, (1+2*i)*Math.PI/16, vec3.fromValues(1, 0, 0));
 		mat4.translate(mat_hor_1, mat_hor_1, vec3.fromValues(0, 0, -4.9));
 		mat4.rotate(mat_hor_1, mat_hor_1, Math.PI/2, vec3.fromValues(1, 0, 0));
-		mat4.scale(mat_hor_1, mat_hor_1, vec3.fromValues(factor_escala, factor_escala, 2));
+		mat4.scale(mat_hor_1, mat_hor_1, vec3.fromValues(factor_escala2, factor_escala2, 2));
 		viga_temp.applyMatrix(mat_hor_1);
 		vigas.add(viga_temp);
 		
-		viga_temp2 = new Mesh( new Cubo() );
-		mat_hor_2 = mat4.create();
+		var viga_temp2 = new Mesh( new Cubo() );
+		var mat_hor_2 = mat4.create();
 		mat4.rotate(mat_hor_2, mat_hor_2, (1+2*i)*Math.PI/16, vec3.fromValues(1, 0, 0));
 		mat4.translate(mat_hor_2, mat_hor_2, vec3.fromValues(0, 0, -2.8));
 		mat4.rotate(mat_hor_2, mat_hor_2, Math.PI/2, vec3.fromValues(1, 0, 0));
-		mat4.scale(mat_hor_2, mat_hor_2, vec3.fromValues(factor_escala, factor_escala, 1.3));
+		mat4.scale(mat_hor_2, mat_hor_2, vec3.fromValues(factor_escala2, factor_escala2, 1.3));
 		viga_temp2.applyMatrix(mat_hor_2);
 		vigas.add(viga_temp2);
 	}
@@ -142,6 +143,7 @@ VueltaAlMundo.soporte = function(){
 }
 
 VueltaAlMundo.vuelta_al_mundo = function(){
+	var factor_escala = 0.10;
 	// corro rueda y soporte a izq
 	rueda_izq = VueltaAlMundo.rueda_vigas();
 	soporte_izq = VueltaAlMundo.soporte();

@@ -3,7 +3,7 @@ MESH
 Esta clase es en definitiva un 'Conjunto' que tiene un objeto 'Geometry'
 ****************************************/
 
-var Mesh = function(geometry, ka, kd, ks, shininess, color, color_specular){
+var Mesh = function(geometry, use_lights, ka, kd, ks, shininess, color, color_specular){
 	Conjunto.call(this);
 	
 	this.geometry = geometry;
@@ -31,6 +31,12 @@ var Mesh = function(geometry, ka, kd, ks, shininess, color, color_specular){
 	if(shininess === undefined)
 		shininess = 64.0;
 	this.shininess = shininess;
+	// bool que define si es afectado por luces
+	if(use_lights === undefined)
+		use_lights = true;
+	this.use_lights = use_lights;
+	// no tiene textura, para eso es TexturedMesh
+	this.has_texture = false;
 }
 
 Mesh.prototype = Object.create(Conjunto.prototype);
@@ -59,6 +65,11 @@ Mesh.prototype.setKs = function(ks){
 Mesh.prototype.setShininess = function(shininess){
 	Conjunto.prototype.setShininess.call(this);
 	this.shininess = shininess;
+}
+
+Mesh.prototype.setUseLights = function(u){
+	Conjunto.prototype.setUseLights.call(this);
+	this.use_lights = u;
 }
 
 Mesh.prototype.clone = function(){
@@ -96,6 +107,12 @@ Mesh.prototype.render = function(m){
 	
 	var u_shininess = gl.getUniformLocation(glProgram, "uShininess");
 	gl.uniform1f(u_shininess, this.shininess);
+	
+	var u_use_lights = gl.getUniformLocation(glProgram, "uUseLights");
+	gl.uniform1i(u_use_lights, this.use_lights);
+	
+	var u_has_texture = gl.getUniformLocation(glProgram, "uHasTexture");
+	gl.uniform1i(u_has_texture, this.has_texture);
 	
 	this.geometry.drawVertexGrid(m_final);
 	

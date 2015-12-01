@@ -1,6 +1,6 @@
 /****************************************
 GEOMETRY
-Esta clase representa un objeto (por ahora cilindro, plano o esfera) que se dibuja en pantalla
+Esta clase representa un objeto que se dibuja en pantalla
 ****************************************/
 
 var Geometry = function() {

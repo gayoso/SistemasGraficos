@@ -25,9 +25,11 @@
 		<script type="text/javascript" src="prismahexagonal.js"></script>
 		<script type="text/javascript" src="prismatriangular.js"></script>
 		<script type="text/javascript" src="esfera.js"></script>
+		<script type="text/javascript" src="dome.js"></script>
 		<script type="text/javascript" src="curva.js"></script>
 		<script type="text/javascript" src="conjunto.js"></script>
 		<script type="text/javascript" src="mesh.js"></script>
+		<script type="text/javascript" src="texturedmesh.js"></script>
 		<script type="text/javascript" src="cabina.js"></script>
 		<script type="text/javascript" src="vueltaalmundo.js"></script>
 		<script type="text/javascript" src="montaniarusa.js"></script>
@@ -47,6 +49,7 @@
             attribute vec3 aVertexPosition;
             attribute vec3 aVertexColor;
 			attribute vec3 aVertexNormal;
+			attribute vec2 aTextureCoord;
 
             // Los uniforms son características propias de una etapa de dibujado completa.
             // Son comunes a todos los vertices involucrados en el dibujado.
@@ -61,6 +64,7 @@
             varying vec3 vColor;
 			varying vec3 vNormal;
 			varying vec3 vertPos;
+			varying vec2 vTextureCoord;
 			
             void main(void) {
                 // gl_Position es una variable "built-in" de GLSL que es usada para 
@@ -69,11 +73,12 @@
 				vertPos = vec3(uMMatrix * vec4(aVertexPosition, 1.0));
                 vColor = aVertexColor;
 				vNormal = vec3(uNMatrix * vec4(aVertexNormal, 0.0));
+				vTextureCoord = aTextureCoord;
             }
         </script>
 
         <!--
-        Fragment shader con iluminacin
+        Fragment shader con iluminacion
 
         Cada pixel en un polígono se llama fragmento. El fragment shader se encarga de
         establecer el color de cada pixel. En este caso, asignamos el color blanco a 
@@ -103,15 +108,35 @@
 			uniform float uKd;
 			uniform float uKs;
 			uniform float uShininess;
+			uniform bool uHasTexture;
+			uniform bool uUseLights;
 			
 			varying vec3 vColor;
 			varying vec3 vNormal;
 			varying vec3 vertPos;
+			varying vec2 vTextureCoord;
+			
+			uniform sampler2D uSampler;
 			
 			void main() {
+				/*if(uHasTexture == true){
+					gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+					return;
+				}*/
+				
 				vec3 normal = normalize(vNormal);			
 				vec3 viewDir = normalize(vertPos - uViewPos);
-				vec3 color = vec3(0.0, 0.0, 0.0);
+				vec3 color;
+				if(uHasTexture){
+					color = vec3(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)));
+				} else {
+					color = vColor;
+				}
+				if(!uUseLights){
+					gl_FragColor = vec4(color, 1.0);
+					return;
+				}
+				vec3 color_final = vec3(0.0, 0.0, 0.0);
 				
 				// point lights
 				for(int i = 0; i < 25; ++i){
@@ -139,8 +164,8 @@
 					   specular = pow(specAngle, uShininess);
 					}
 					
-					color += Ia * vColor * uKa + 
-										(Ip / numLights) * fatt * (vColor * uKd * lambertian + 
+					color_final += Ia * color * uKa + 
+										(Ip / numLights) * fatt * (color * uKd * lambertian + 
 													uColorSpecular * uKs * specular);
 				}
 				
@@ -169,11 +194,11 @@
 					   specular = pow(specAngle, uShininess);
 					}
 					
-					color += Ia * vColor * uKa + 
-										(Ip / numLights) * fatt * (vColor * uKd * lambertian + 
+					color_final += Ia * color * uKa + 
+										(Ip / numLights) * fatt * (color * uKd * lambertian + 
 													uColorSpecular * uKs * specular);
 				}
-				gl_FragColor = vec4(color, 1.0);
+				gl_FragColor = vec4(color_final, 1.0);
 			}
         </script>
 		
@@ -195,7 +220,7 @@
             uniform mat4 uPMatrix;
 			uniform mat4 uNMatrix;
 			
-			varying vColor
+			varying vec3 vColor;
 			
             void main(void) {
                 // gl_Position es una variable "built-in" de GLSL que es usada para 
@@ -448,9 +473,6 @@
                     setupWebGL();
                     initShaders();
                     setupBuffers();
-    				// esta es una funcion de javascript que llama a drawScene cada 10 segundos
-					// tal vez cambiar por gl.requestAnimationFrame(drawScene), que llamaria a drawScene cada vez que webgl pide dibujar
-                    //setInterval(drawScene, 10); 
 					requestAnimationFrame(drawScene);
                 }else{    
                     alert(  "Error: Your browser does not appear to support WebGL.");
@@ -526,12 +548,12 @@
 				mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 				sillas_giratorias.setTransform(m2);
 
-				montania_rusa = new MontaniaRusa();
+				//montania_rusa = new MontaniaRusa();
 				
 				/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
 				// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
-				/*
-				var puntos = [];
+				
+				/*var puntos = [];
 				puntos.push(vec3.fromValues(5, 2, 0));
 				puntos.push(vec3.fromValues(5, 2, 4));
 				puntos.push(vec3.fromValues(5, 3, 5.5));
@@ -558,8 +580,8 @@
 				puntos.push(vec3.fromValues(8.5, 3, 4));
 				puntos.push(vec3.fromValues(8.3, 3, 2));
 				puntos.push(vec3.fromValues(8, 2.5, 0.5));
-				puntos.push(vec3.fromValues(5, 2, 0));
-				*/
+				puntos.push(vec3.fromValues(5, 2, 0));*/
+				
 				
 				/*** DESCOMENTAR ESTO PARA CREAR UNA CURVA ***/
 				/*curva1 = new Mesh( new Curva(puntos) );
@@ -567,8 +589,8 @@
 				var centro = curva1.getCenter();
 				vec3.scale(centro, centro, -1);
 				mat4.translate(m1, m1, centro);
-				curva1.applyMatrix(m1);
-				*/
+				curva1.applyMatrix(m1);*/
+				
 				/*** DESCOMENTAR ESTO PARA CREAR EL MODELO DE TRACK ***/
 				// Track tiene un modelo de riel para la montaña rusa, pero no logre hacer que funcione bien
 				// la idea era definir en curva que arme la curva aproximando con rectas de largo predefinido
@@ -579,7 +601,7 @@
 				var p1 = vec3.fromValues(4, 0, 0);
 				// esta funcion deberia trasladar el riel al punto p0, y orientarlo segun el vector p0p1
 				// crei que estaba bien hecho, pero cuando lo pruebo en curva2 queda horrible y no alineado
-				track.fitToSegment(p0, p1);
+				track.fitToSegment(p0, p1);*/
 				
 				/*** DESCOMENTAR PARA CREAR CURVA CON TRACKS (anda para el orto y puede que se laguee banda) ***/
 				//curva2 = new CurvedGeometry(puntos, new Track());
@@ -588,33 +610,67 @@
                 //vecArriba = vec3.fromValues(-0.38,0.92,0);
                 vecArriba = vec3.fromValues(0,1,0);
 				
+				/*** CREO LA ESCENA ***/
 				escena = new Scene();
 				escena.addConjunto(vuelta_al_mundo);
 				escena.addConjunto(sillas_giratorias);
 
 				// esta es una luz blanca de arriba (de infinito)
-				escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 10.0, 0.0), 
-											vec3.fromValues(1.0, 1.0, 1.0), 
-											vec3.fromValues(1.0, 1.0, 1.0)));
+				escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 1.0, -0.5), 
+											vec3.fromValues(0.8, 0.8, 0.8), 
+											vec3.fromValues(0.9, 0.9, 0.9)));
 				// esta es una luz blanca en un costado (sale de donde esta la esfera)
-				escena.addLight(new PointLight(vec3.fromValues(0.0, 0.0, -30.0), 
+				/*escena.addLight(new PointLight(vec3.fromValues(0.0, 100.0, -30.0), 
 											vec3.fromValues(1.0, 1.0, 1.0), 
-											vec3.fromValues(0.0, 0.0, 0.0)));
+											vec3.fromValues(0.0, 0.0, 0.0)));*/
 				
-				piso = new Mesh( new Circulo() );
+				/*** ESTO DEFINE LA GEOMETRIA DEL PISO, SU TEXTURA Y COMO MAPEARLA ***/
+				var mapper_piso = function(){
+					var cant_tiles = 50;
+					var buffer = [];
+					
+					buffer.push(0);
+					buffer.push(0);
+					
+					buffer.push(cant_tiles);
+					buffer.push(0);
+					
+					buffer.push(0);
+					buffer.push(cant_tiles);
+					
+					buffer.push(cant_tiles);
+					buffer.push(cant_tiles);
+					
+					return buffer;
+				}
+				
+				piso = new TexturedMesh( "156.jpg", mapper_piso, new Cuadrado() );
 				m_piso = mat4.create();
 				mat4.translate(m_piso, m_piso, vec3.fromValues(0, -15, 0));
 				mat4.rotate(m_piso, m_piso, -Math.PI/2, vec3.fromValues(1, 0, 0));
-				mat4.scale(m_piso, m_piso, vec3.fromValues(200, 200, 200));
+				mat4.scale(m_piso, m_piso, vec3.fromValues(1000, 1000, 1000));
 				piso.applyMatrix(m_piso);
-				piso.setColor(Color.FORESTGREEN);
 				escena.addConjunto(piso);
 				
-				cielo = new Mesh( new Esfera() );
+				/*** ESTO DEFINE LA GEOMETRIA DEL CIELO, SU TEXTURA Y COMO MAPEARLA ***/
+				var mapper_cielo = function (){
+					var buffer = [];
+					for (var i = 0.0; i < 50; i++) {
+						for (var j = 0.0; j < 50; j++) {
+							
+							buffer.push(1-j/50);
+							buffer.push(1-i/50);
+						}
+					}
+					return buffer;
+				}
+				
+				cielo = new TexturedMesh("sky.jpg", mapper_cielo, new Esfera(), false);
 				m_cielo = mat4.create();
+				mat4.translate(m_cielo, m_cielo, vec3.fromValues(0, -15, 0));
 				mat4.scale(m_cielo, m_cielo, vec3.fromValues(500, 500, 500));
+				mat4.rotate(m_cielo, m_cielo, -Math.PI/2, vec3.fromValues(1, 0, 0));
 				cielo.applyMatrix(m_cielo);
-				cielo.setColor(Color.SUMMERSKY);
 				escena.addConjunto(cielo);
             }
             
@@ -651,15 +707,7 @@
 				// Dibujar modelos
 				/*** DESCOMENTAR ESTO PARA QUE LOS MODELOS SE DIBUJEN ***/
 				/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-				//vuelta_al_mundo.render();
-				//sillas_giratorias.render();
 				escena.render();
-				//montania_rusa.render();
-				//curva1.render();
-				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE UN TRACK ***/
-				//track.render();
-				/*** DESCOMENTAR ESTO PARA QUE SE DIBUJE LA CURVA CON TRACK ***/
-				//curva2.render();
             }
 
         </script>

@@ -1,6 +1,4 @@
 
-// funca mal, igual no lo usamos
-
 var Cono = function(_factor){
 	this.setRows();
 	this.setCols();
@@ -67,7 +65,7 @@ Cono.prototype.createConeGrid = function(){
 		this.normals_buffer.push(0);
 	}
 	
-	for (var i = 0.0; i < this.rows; i++) { 
+	for (var i = 0.0; i < this.rows; i++) {
 		for (var j = 0.0; j < this.cols; j++) {
 
 			// Para cada vértice definimos su posición
@@ -96,7 +94,7 @@ Cono.prototype.createConeGrid = function(){
 		var angulo = j * 2 * Math.PI / (this.cols-1);
 		this.position_buffer.push((1/(this.factor*(this.rows-1)+1))*Math.cos(angulo));
 		this.position_buffer.push((1/(this.factor*(this.rows-1)+1))*Math.sin(angulo));
-		this.position_buffer.push(1/2);
+		this.position_buffer.push(this.rows-1-(this.rows-1)/2);
 
 		this.color_buffer.push(0.5);
 		this.color_buffer.push(0.2);
