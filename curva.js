@@ -12,6 +12,7 @@ var Curva = function(_puntos, _largo) {
 	this.rows = 0;
 	this.cols = 0;
 	
+	this.derivadas = [];
 	Geometry.call(this, this.gridType);
 	this.init();
 }
@@ -23,14 +24,18 @@ Curva.prototype.createGrid = function(){
 	this.createCurveGrid();
 }
 
+Curva.prototype.getDerivada = function(){
+	return this.derivadas;
+}
+
 Curva.prototype.createCurveGrid = function(){
 	var x = new Array();
 	var y = new Array();
 	var z = new Array();
 	for(var i = 0; i < this.puntos.length; i++){
-		x[i] = this.puntos[i][0]*5;
-		y[i] = this.puntos[i][1]*5;
-		z[i] = this.puntos[i][2]*5;
+		x[i] = this.puntos[i][0];
+		y[i] = this.puntos[i][1];
+		z[i] = this.puntos[i][2];
 	}
 	var px = null, py = null, pz = null;
 	if(x[0] === x[x.length-1] && y[0] === y[y.length-1] && z[0] === z[z.length-1]){
@@ -54,7 +59,7 @@ Curva.prototype.createCurveGrid = function(){
 		//var bezier_curve = [];
 		var punto_anterior = punto0;
 		var largo = 0;
-		
+
 		// recorro una vez con un paso arbitrario chico para obtener el largo de la curva
 		for(var s = 0; s < 10; s += 1){
 			var t = s/10.0;
@@ -62,22 +67,31 @@ Curva.prototype.createCurveGrid = function(){
 			var coef1 = 3*t*Math.pow(1-t, 2);
 			var coef2 = 3*t*t*(1-t);
 			var coef3 = t*t*t;
-			
+
+
+
 			var p0_escalado = vec3.create();
 			var p1_escalado = vec3.create();
 			var p2_escalado = vec3.create();
 			var p3_escalado = vec3.create();
 			
+
+
 			vec3.scale(p0_escalado, punto0, coef0);
 			vec3.scale(p1_escalado, punto1, coef1);
 			vec3.scale(p2_escalado, punto2, coef2);
 			vec3.scale(p3_escalado, punto3, coef3);
+
+
 			
 			var bezier_point = vec3.create();
 			vec3.add(bezier_point, p0_escalado, p1_escalado);
 			vec3.add(bezier_point, bezier_point, p2_escalado);
 			vec3.add(bezier_point, bezier_point, p3_escalado);
 			//bezier_curve.push(bezier_point);
+
+
+
 			
 			largo += vec3.distance(punto_anterior, bezier_point);
 			punto_anterior = bezier_point;
@@ -118,6 +132,24 @@ Curva.prototype.createCurveGrid = function(){
 			
 			this.putSlice(bezier_point, color);
 			this.rows++;
+
+			var coef0_derivado = -3*Math.pow(1-t,2);
+			var coef1_derivado = 3*Math.pow(1-t,2) - 6*t*(1-t);
+			var coef2_derivado = 6*t*(1-t) - 3*t*t;
+			var coef3_derivado = 3*t*t;
+			var p0d_escalado = vec3.create();
+			var p1d_escalado = vec3.create();
+			var p2d_escalado = vec3.create();
+			var p3d_escalado = vec3.create();
+			vec3.scale(p0d_escalado, punto0, coef0_derivado);
+			vec3.scale(p1d_escalado, punto1, coef1_derivado);
+			vec3.scale(p2d_escalado, punto2, coef2_derivado);
+			vec3.scale(p3d_escalado, punto3, coef3_derivado);
+			var bezier_point_derivado = vec3.create();
+			vec3.add(bezier_point_derivado,p0d_escalado, p1d_escalado);
+			vec3.add(bezier_point_derivado, bezier_point_derivado, p2d_escalado);
+			vec3.add(bezier_point_derivado, bezier_point_derivado, p3d_escalado);
+			this.derivadas.push([bezier_point, bezier_point_derivado]);
 		}
 	}
 	// como no es exacto todo esto, fuerzo a agregar el ultimo punto por el que me piden que pase (si dio justo y llego, no cambia nada)
