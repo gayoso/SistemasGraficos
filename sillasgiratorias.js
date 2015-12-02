@@ -145,34 +145,39 @@ SillasGiratorias.prototype.girar = function(){
 }
 
 SillasGiratorias.pilar = function(){
-	var cil1 = new Mesh( new Cilindro() );
+	var cil1 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cilindro(), 1, true, 0.25, 0.5, 1 );
+	//var cil1 = new Mesh( new Cilindro() );
 	var matr1 = mat4.create();
 	mat4.rotate(matr1, matr1, Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(matr1, matr1, vec3.fromValues(1, 1, 3));
 	cil1.applyMatrix(matr1);
 	
-	var cil2 = new Mesh( new Cono(4) );
+	var cil2 = new TexturedMesh( "sillas_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cono(4), 1, true, 0.25, 0.5, 1);
+	//var cil2 = new Mesh( new Cono(4) );
 	var matr2 = mat4.create();
 	mat4.translate(matr2, matr2, vec3.fromValues(0, 2, 0));
 	mat4.rotate(matr2, matr2, -Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(matr2, matr2, vec3.fromValues(1, 1, 1));
 	cil2.applyMatrix(matr2);
 	
-	var cil3 = new Mesh( new Cilindro() );
+	var cil3 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cilindro(), 1, true, 0.25, 0.5, 1, 2 );
+	//var cil3 = new Mesh( new Cilindro() );
 	var matr3 = mat4.create();
 	mat4.translate(matr3, matr3, vec3.fromValues(0, 3, 0));
 	mat4.rotate(matr3, matr3, Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(matr3, matr3, vec3.fromValues(0.7, 0.7, 2));
 	cil3.applyMatrix(matr3);
 	
-	var cil4 = new Mesh( new Cono(4) );
+	var cil4 = new TexturedMesh( "sillas_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cono(4), 1, true, 0.25, 0.5, 1);
+	//var cil4 = new Mesh( new Cono(4) );
 	var matr4 = mat4.create();
 	mat4.translate(matr4, matr4, vec3.fromValues(0, 4.10, 0));
 	mat4.rotate(matr4, matr4, -Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(matr4, matr4, vec3.fromValues(0.7, 0.7, 0.2));
 	cil4.applyMatrix(matr4);
 	
-	var cil5 = new Mesh( new Cilindro() );
+	var cil5 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cilindro(), 1, true, 0.25, 0.5, 1 );
+	//var cil5 = new Mesh( new Cilindro() );
 	var matr5 = mat4.create();
 	mat4.translate(matr5, matr5, vec3.fromValues(0, 5.2, 0));
 	mat4.rotate(matr5, matr5, Math.PI/2, vec3.fromValues(1, 0, 0));
@@ -263,14 +268,17 @@ SillasGiratorias.silla = function(){
 }
 
 SillasGiratorias.tope = function(){
-	var cil1 = new Mesh( new Cilindro() );
+	
+	var cil1 = new TexturedMesh( "sillas_texture2.jpg", TexturedMesh.mapper_sillas_tope, new Cilindro() );
+	//var cil1 = new Mesh( new Cilindro() );
 	var matr1 = mat4.create();
 	mat4.translate(matr1, matr1, vec3.fromValues(0, 1.5, 0));
 	mat4.rotate(matr1, matr1, Math.PI/2, vec3.fromValues(1, 0, 0));
 	mat4.scale(matr1, matr1, vec3.fromValues(7, 7, 1.5));
 	cil1.applyMatrix(matr1);
 	
-	var cil2 = new Mesh( new Cono(90) );
+	var cil2 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_tope, new Cono(90) );
+	//var cil2 = new Mesh( new Cono(90) );
 	var matr2 = mat4.create();
 	//mat4.translate(matr1, matr1, vec3.fromValues(0, 5.2, 0));
 	mat4.rotate(matr2, matr2, Math.PI/2, vec3.fromValues(1, 0, 0));

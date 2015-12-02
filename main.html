@@ -36,6 +36,7 @@
 	<script type="text/javascript" src="scene.js"></script>
 	<script type="text/javascript" src="light_point.js"></script>
 	<script type="text/javascript" src="light_directional.js"></script>
+	<script type="text/javascript" src="agua.js"></script>
 	<!--
 	Vertex shader con iluminacion
 
@@ -56,6 +57,8 @@
 		uniform mat4 uVMatrix;
 		uniform mat4 uPMatrix;
 		uniform mat4 uNMatrix;
+		
+		//uniform bool uUseReflection;
 
 		// Los varying son propiedades que toman valor para cada fragmento a partir
 		// de interpolar linealmente entre los valores que se les asigna en cada 
@@ -66,6 +69,7 @@
 		varying vec3 vBinormal;
 		varying vec3 vertPos;
 		varying vec2 vTextureCoord;
+		//varying vec3 reflectDir;
 		
 		void main(void) {
 			// gl_Position es una variable "built-in" de GLSL que es usada para 
@@ -77,6 +81,12 @@
 			vBinormal = normalize(vec3(uNMatrix * vec4(normalize(aVertexBinormal), 0.0)));
 			vTangente = normalize(vec3(uNMatrix * vec4(normalize(aVertexTangent), 0.0)));
 			vTextureCoord = aTextureCoord;
+			
+			/*if (uUseReflection) {
+				vec3 view = normalize(vertPos);
+				reflectDir = reflect(view, vNormal);
+				//reflectDir = vec3(uInverseVMatrix * vec4(reflectDir, 0.0));
+			}*/
 		}
 	</script>
 
@@ -111,10 +121,15 @@
 		uniform float uKd;
 		uniform float uKs;
 		uniform float uShininess;
+		uniform float uReflectiveness;
 		uniform bool uHasTexture;
 		uniform bool uUseLights;
+		uniform float uTime;
+		uniform bool uUseWaterEffect;
+		uniform bool uBlendTexture;
 		
 		uniform bool uUseNormalMap;
+		uniform bool uUseReflection;
 		
 		varying vec3 vColor;
 		varying vec3 vNormal;
@@ -125,12 +140,20 @@
 		
 		uniform sampler2D uSampler;
 		uniform sampler2D uNormalSampler;
+		uniform sampler2D uReflectionSampler;
 		
 		void main() {
-			/*if(uHasTexture == true){
-				gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-				return;
-			}*/
+			
+			vec2 texCoord = vTextureCoord;
+			vec2 secTexCoord = vTextureCoord;
+			float mix_factor = 1.0;
+
+			if(uUseWaterEffect){
+				mix_factor = 0.5;
+				secTexCoord = vec2(secTexCoord.t, -secTexCoord.s) * 2.0;
+				texCoord.t += uTime/10000.0;
+				secTexCoord.t += uTime/10000.0;
+			}
 			
 			vec3 normal = normalize(vNormal);	
 			if (uUseNormalMap){
@@ -138,23 +161,36 @@
 				vec3 binormal = normalize(vBinormal);
 			
 				mat3 tbn = mat3(tangent, binormal, normal);
-				vec3 normalCoordinate = texture2D(uNormalSampler, vec2(vTextureCoord.s, vTextureCoord.t)).xyz * 2.0 - 1.0;
+				normal = texture2D(uNormalSampler, texCoord).xyz;
+				normal = mix(normal, texture2D(uNormalSampler, secTexCoord).xyz, mix_factor);
+				normal = normalize((normal - vec3(0.5, 0.5, 0.5)) * 2.0);
 			
 				//Transform the normal vector in the RGB channels to tangent space
-				normal = normalize(tbn * normalCoordinate);
+				normal = normalize(tbn * normal);
 			}
 			
 			vec3 viewDir = normalize(vertPos - uViewPos);
-			vec3 color;
+			vec3 color = vColor;
 			if(uHasTexture){
-				color = vec3(texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)));
-			} else {
-				color = vColor;
+				color = texture2D(uSampler, texCoord).rgb;
+				color = mix(color, texture2D(uSampler, secTexCoord).rgb, mix_factor);
+				if(uBlendTexture){
+					color *= vColor;
+				}
 			}
+
 			if(!uUseLights){
 				gl_FragColor = vec4(color, 1.0);
 				return;
 			}
+			
+			/*if(uUseReflection){
+				vec3 reflDir = reflect(uViewPos, normal);
+				reflDir = vec3(reflDir.x, -reflDir.z, reflDir.y);
+				vec3 reflColor = texture2D(uReflectionSampler, reflDir).rgb * color;
+				color = mix(color, reflColor, uReflectiveness);
+			}*/
+			
 			vec3 color_final = vec3(0.0, 0.0, 0.0);
 			
 			// point lights
@@ -184,7 +220,7 @@
 				}
 				
 				color_final += Ia * color * uKa + 
-									(Ip / numLights) * fatt * (color * uKd * lambertian + 
+									(Ip/* / numLights*/) * fatt * (color * uKd * lambertian + 
 												uColorSpecular * uKs * specular);
 			}
 			
@@ -214,81 +250,13 @@
 				}
 				
 				color_final += Ia * color * uKa + 
-									(Ip / numLights) * fatt * (color * uKd * lambertian + 
+									(Ip/* / numLights*/) * fatt * (color * uKd * lambertian + 
 												uColorSpecular * uKs * specular);
 			}
 			gl_FragColor = vec4(color_final, 1.0);
 		}
 	</script>
 	
-	<!--
-	Vertex shader pelado
-
-	El vertex shader define la posición y forma de cada vertice de cada polígono.
-	--> 
-	<script id="shader-vs" type="x-shader/x-vertex">
-		// Los atributos son características propias de cada vertice.
-		attribute vec3 aVertexPosition;
-		attribute vec3 aVertexColor;
-		attribute vec3 aVertexNormal;
-
-		// Los uniforms son características propias de una etapa de dibujado completa.
-		// Son comunes a todos los vertices involucrados en el dibujado.
-		uniform mat4 uMMatrix;
-		uniform mat4 uVMatrix;
-		uniform mat4 uPMatrix;
-		uniform mat4 uNMatrix;
-		
-		varying vec3 vColor;
-		
-		void main(void) {
-			// gl_Position es una variable "built-in" de GLSL que es usada para 
-			// almacenar la posición resultante del fragmento.
-			gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
-			vColor = aVertexColor;
-		}
-	</script>
-
-	<!--
-	Fragment shader pelado
-
-	Cada pixel en un polígono se llama fragmento. El fragment shader se encarga de
-	establecer el color de cada pixel. En este caso, asignamos el color blanco a 
-	cada pixel.
-	-->
-	<script id="shader-fs" type="x-shader/x-fragment">
-		precision highp float;
-		// luces
-		struct PointLight {
-			vec3 position;
-			vec3 ambient;
-			vec3 intensity;
-		};
-		struct DirLight {
-			vec3 direction;
-			vec3 ambient;
-			vec3 intensity;
-		};
-		uniform PointLight pointLights[25];
-		uniform DirLight dirLights[25];
-		uniform float numLights;
-		
-		// material
-		uniform vec3 uViewPos;
-		uniform vec3 uColorSpecular;
-		uniform float uKa;
-		uniform float uKd;
-		uniform float uKs;
-		uniform float uShininess;
-		
-		varying vec3 vColor;
-		varying vec3 vNormal;
-		varying vec3 vertPos;
-		
-		void main() {
-			gl_FragColor = vec4(vColor, 1.0);
-		}
-	</script>
 
 	<script>
 		var gl = null,
@@ -301,6 +269,7 @@
 			vuelta_al_mundo = null,
 			piso = null,
 			cielo = null,
+			agua = null,
 			montania_rusa = null;
 
 		var mvMatrix = mat4.create();
@@ -313,6 +282,22 @@
 		var puntoMirado = null;
 		var vecArriba = null;
 		var camara = 1;
+		
+		/**
+		* Provides requestAnimationFrame in a cross browser way.
+		* @author paulirish / http://paulirish.com/
+		*/
+		if ( !window.requestAnimationFrame ) {
+			window.requestAnimationFrame = ( function() {
+				return window.webkitRequestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.oRequestAnimationFrame ||
+				window.msRequestAnimationFrame ||
+				function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+					window.setTimeout( callback, 1000 / 60 );
+				};
+			} )();
+		}
 
 		function handleMouseDown(event) {
 			mouseDown = true;
@@ -477,7 +462,11 @@
 		{
 			canvas = document.getElementById("my-canvas");  
 			try{
-				gl = canvas.getContext("webgl", { preserveDrawingBuffer: true }) || canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });     
+				gl = canvas.getContext("webgl", { preserveDrawingBuffer: true }) || canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });   			
+				/*var blending = document.getElementById("blending").checked;
+				if (blending) {
+					gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+				}*/
 				canvas.onmousedown = handleMouseDown;
 				document.onmouseup = handleMouseUp;
 				document.onmousemove = handleMouseMove; 
@@ -561,15 +550,8 @@
 			mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
 			mat4.scale(m1, m1, vec3.fromValues(4, 4, 4));
 			vuelta_al_mundo.setTransform(m1);
-			
-			sillas_giratorias = new SillasGiratorias();
-			var m2 = mat4.create();
-			mat4.translate(m2, m2, vec3.fromValues(5, -11.99, 10));
-			mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
-			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
-			sillas_giratorias.setTransform(m2);
 
-			//montania_rusa = new MontaniaRusa();
+			montania_rusa = new MontaniaRusa();
 			
 			/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
 			// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
@@ -634,20 +616,24 @@
 			/*** CREO LA ESCENA ***/
 			escena = new Scene();
 			escena.addConjunto(vuelta_al_mundo);
-			escena.addConjunto(sillas_giratorias);
+			
 
 			// esta es una luz blanca de arriba (de infinito)
-			/*escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 1.0, 0.0), 
-										vec3.fromValues(1, 1, 1), 
-										vec3.fromValues(1.5, 1.5, 1.5)));*/
+			escena.addLight(new DirectionalLight(vec3.fromValues(0.0, 1, 0.0), 
+										vec3.fromValues(0.5, 0.5, 0.5), 
+										vec3.fromValues(1.5, 1.5, 1.5)));
+			/*escena.addLight(new PointLight(vec3.fromValues(0.0, -10.0, 0.0), 
+										vec3.fromValues(0.5, 0.5, 0.5), 
+										vec3.fromValues(0.5, 0.5, 0.5)));*/
 			// esta es una luz blanca en un costado (sale de donde esta la esfera)
-			escena.addLight(new PointLight(vec3.fromValues(0.0, 200.0, -50.0), 
-										vec3.fromValues(2.0, 2.0, 2.0), 
-										vec3.fromValues(1.0, 1.0, 1.0)));
+			/*escena.addLight(new PointLight(vec3.fromValues(0.0, 200.0, -50.0), 
+										vec3.fromValues(1.0, 1.0, 1.0), 
+										vec3.fromValues(0.5, 0.5, 0.5)));*/
 			
-			/*** ESTO DEFINE LA GEOMETRIA DEL PISO, SU TEXTURA Y COMO MAPEARLA ***/
-			var mapper_piso = function(){
-				var cant_tiles = 200;
+			/*** ESTO DEFINE LA GEOMETRIA DEL PISO, SU TEXTURA Y COMO MAPEARLA ***/	
+			
+			/*var mapper_agua = function(){
+				var cant_tiles = 20;
 				var buffer = [];
 				
 				buffer.push(0);
@@ -663,37 +649,42 @@
 				buffer.push(cant_tiles);
 				
 				return buffer;
-			}
+			}*/
+
+			agua = new Agua();
+			var m_agua = mat4.create();
+			mat4.translate(m_agua, m_agua, vec3.fromValues(0, -15.1, 0));
+			mat4.rotate(m_agua, m_agua, -Math.PI/2, vec3.fromValues(1, 0, 0));
+			mat4.scale(m_agua, m_agua, vec3.fromValues(1000, 1000, 1000));
+			agua.applyMatrix(m_agua);
+			escena.addConjunto(agua);
 			
-			piso = new TexturedMesh( "grass_diffuse.jpg", mapper_piso, new Cuadrado(), true, 0.3, 2, 2);
-			piso.loadNormalTexture("grass_normal.jpg");
-			m_piso = mat4.create();
+			piso = new TexturedMesh( "grass_diffuse2.jpg", TexturedMesh.mapper_piso, new Cuadrado(), 15, true, 0.5, 1, 0.5);
+			piso.loadNormalTexture("grass_normal2.jpg");
+			var m_piso = mat4.create();
 			mat4.translate(m_piso, m_piso, vec3.fromValues(0, -15, 0));
 			mat4.rotate(m_piso, m_piso, -Math.PI/2, vec3.fromValues(1, 0, 0));
-			mat4.scale(m_piso, m_piso, vec3.fromValues(1000, 1000, 1000));
+			mat4.scale(m_piso, m_piso, vec3.fromValues(100, 100, 100));
 			piso.applyMatrix(m_piso);
 			escena.addConjunto(piso);
 			
 			/*** ESTO DEFINE LA GEOMETRIA DEL CIELO, SU TEXTURA Y COMO MAPEARLA ***/
-			var mapper_cielo = function (){
-				var buffer = [];
-				for (var i = 0.0; i < 50; i++) {
-					for (var j = 0.0; j < 50; j++) {
-						
-						buffer.push(1-j/50);
-						buffer.push(1-i/50);
-					}
-				}
-				return buffer;
-			}
 			
-			cielo = new TexturedMesh("sky.jpg", mapper_cielo, new Esfera(), false);
-			m_cielo = mat4.create();
+			cielo = new TexturedMesh("sky.jpg", TexturedMesh.mapper_cielo, new Esfera(), false, false);
+			var m_cielo = mat4.create();
 			mat4.translate(m_cielo, m_cielo, vec3.fromValues(0, -15, 0));
 			mat4.scale(m_cielo, m_cielo, vec3.fromValues(500, 500, 500));
 			mat4.rotate(m_cielo, m_cielo, -Math.PI/2, vec3.fromValues(1, 0, 0));
 			cielo.applyMatrix(m_cielo);
 			escena.addConjunto(cielo);
+			
+			sillas_giratorias = new SillasGiratorias();
+			var m2 = mat4.create();
+			mat4.translate(m2, m2, vec3.fromValues(5, -11.99, 10));
+			mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
+			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
+			sillas_giratorias.setTransform(m2);
+			escena.addConjunto(sillas_giratorias);
 		}
 		
 		function drawScene()

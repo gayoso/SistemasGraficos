@@ -8,6 +8,8 @@ var Scene = function() {
 	
 	this.conjuntos = [];
 	this.lights = [];
+	this.timer = new Timer();
+	this.timer.start();
 }
 
 Scene.prototype = {
@@ -27,6 +29,10 @@ Scene.prototype = {
 	render: function(){
 		var u_num_lights = gl.getUniformLocation(glProgram, "numLights");
 		gl.uniform1f(u_num_lights, this.lights.length);
+		
+		var u_time = gl.getUniformLocation(glProgram, "uTime");
+		gl.uniform1f(u_time, this.timer.elapsed_miliseconds());
+		
 		for(var i = 0, l = this.lights.length; i < l; ++i){
 			this.lights[i].render(i);
 		}

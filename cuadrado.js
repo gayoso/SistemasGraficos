@@ -3,14 +3,15 @@ var Cuadrado = function(){
 	this.setRows();
 	this.setCols();
 	
-	// cosas para pasto y agua (deberia o estar en Geometry o en otra clase abstracta, para que todas las hijas las implementen)
-	this.tangent_buffer = [];
+	/*this.tangent_buffer = [];
 	this.binormal_buffer = [];
 	
 	this.webgl_tangent_buffer = null;
-	this.webgl_binormal_buffer = null;
+	this.webgl_binormal_buffer = null;*/
 	
 	Geometry.call(this, this.gridType);
+	this.tangent_buffer = [];
+	this.binormal_buffer = [];
 	this.init();
 }
 
@@ -58,7 +59,7 @@ Cuadrado.prototype.createUniformPlaneGrid = function(){
 			this.tangent_buffer.push(0);
 			
 			this.binormal_buffer.push(0);
-			this.binormal_buffer.push(-1);
+			this.binormal_buffer.push(1);
 			this.binormal_buffer.push(0);
 		};
 	};
@@ -193,7 +194,7 @@ Cuadrado.prototype.createUniformPlaneGrid = function(){
 	this.rows++;*/
 };
 
-Cuadrado.prototype.setupWebGLBuffers = function(){
+/*Cuadrado.prototype.setupWebGLBuffers = function(){
 
 	Geometry.prototype.setupWebGLBuffers.call(this);
 	
@@ -206,11 +207,11 @@ Cuadrado.prototype.setupWebGLBuffers = function(){
 	this.webgl_binormal_buffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_binormal_buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.binormal_buffer), gl.STATIC_DRAW);  
-};
+};*/
 
 // Esta función es la que se encarga de configurar todo lo necesario
 // para dibujar el VertexGrid.
-Cuadrado.prototype.drawVertexGrid = function(m){
+/*Cuadrado.prototype.drawVertexGrid = function(m){
 
 	var vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");
 	gl.enableVertexAttribArray(vertexPositionAttribute);
@@ -260,4 +261,4 @@ Cuadrado.prototype.drawVertexGrid = function(m){
 	gl.disableVertexAttribArray(vertexPositionAttribute);
 	gl.disableVertexAttribArray(vertexColorAttribute);
 	gl.disableVertexAttribArray(vertexNormalAttribute);
-}
+}*/

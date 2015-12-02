@@ -18,6 +18,16 @@ var Cabina = function(color){
 Cabina.prototype = Object.create(Conjunto.prototype);
 Cabina.prototype.constructor = Cabina;
 
+Cabina.prototype.render = function(m){
+	
+	var u_blend_texture = gl.getUniformLocation(glProgram, "uBlendTexture");
+	gl.uniform1i(u_blend_texture, 1);
+	
+	Conjunto.prototype.render.call(this, m);
+	
+	gl.uniform1i(u_blend_texture, 0);
+}
+
 // POR SI ALGO NO ANDA, ACA ESTA HARDCODEADO QUE EL CENTRO DE LA CABINA ES EL PUNTO '3' DEL TRIANGULO '1' DEL TECHO (es el punto mas alto del techo)
 Cabina.prototype.getCenter = function(m){
 	var cabina = this.children[0];
@@ -64,28 +74,32 @@ Cabina.cabina = function(paredes_techo, piso){
 }
 
 Cabina.cabinaParedAncha = function(){
-	var pared_grande_arriba = new Mesh(new Cuadrado());
+	var pared_grande_arriba = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_arriba.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_arriba = mat4.create();
 	mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
 	mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 3, 1));
 	pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
 	
-	var pared_grande_abajo = new Mesh(new Cuadrado());
+	var pared_grande_abajo = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_abajo.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_abajo = mat4.create();
 	mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1.25));
 	mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(1.5, 3, 1));
 	pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
 	
-	var pared_grande_izq = new Mesh(new Cuadrado());
+	var pared_grande_izq = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_izq.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_izq = mat4.create();
 	mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1.75, 0));
 	mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
 	pared_grande_izq.applyMatrix(mat_pared_grande_izq);
 	
-	var pared_grande_der = new Mesh(new Cuadrado());
+	var pared_grande_der = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_der.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_der = mat4.create();
 	mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.75, 0));
 	mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
@@ -111,28 +125,32 @@ Cabina.cabinaParedAncha = function(){
 }
 
 Cabina.cabinaParedAngosta = function(){
-	var pared_grande_arriba = new Mesh(new Cuadrado());
+	var pared_grande_arriba = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_arriba.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_arriba = mat4.create();
 	mat4.translate(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(2, 0, -1.75));
 	mat4.rotate(mat_pared_grande_arriba, mat_pared_grande_arriba, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_arriba, mat_pared_grande_arriba, vec3.fromValues(0.5, 1.5, 1));
 	pared_grande_arriba.applyMatrix(mat_pared_grande_arriba);
 	
-	var pared_grande_abajo = new Mesh(new Cuadrado());
+	var pared_grande_abajo = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_abajo.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_abajo = mat4.create();
 	mat4.translate(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 0, 1));
 	mat4.rotate(mat_pared_grande_abajo, mat_pared_grande_abajo, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_abajo, mat_pared_grande_abajo, vec3.fromValues(2, 1.5, 1));
 	pared_grande_abajo.applyMatrix(mat_pared_grande_abajo);
 	
-	var pared_grande_izq = new Mesh(new Cuadrado());
+	var pared_grande_izq = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_izq.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_izq = mat4.create();
 	mat4.translate(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(2, 1, 0));
 	mat4.rotate(mat_pared_grande_izq, mat_pared_grande_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_pared_grande_izq, mat_pared_grande_izq, vec3.fromValues(4, 0.5, 1));
 	pared_grande_izq.applyMatrix(mat_pared_grande_izq);
 	
-	var pared_grande_der = new Mesh(new Cuadrado());
+	var pared_grande_der = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	pared_grande_der.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_pared_grande_der = mat4.create();
 	mat4.translate(mat_pared_grande_der, mat_pared_grande_der, vec3.fromValues(2, -1.0, 0));
 	mat4.rotate(mat_pared_grande_der, mat_pared_grande_der, Math.PI/2, vec3.fromValues(0, 1, 0));
@@ -202,14 +220,16 @@ Cabina.cabinaParedes = function(pared_grande1, pared_grande2, pared_chica1, pare
 }
 
 Cabina.cabinaTecho = function(){
-	var rect_largo_izq = new Mesh( new Cuadrado() );
+	var rect_largo_izq = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	rect_largo_izq.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_rect_largo_izq = mat4.create();
 	mat4.translate(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(1, 0, 0));
 	mat4.rotate(mat_rect_largo_izq, mat_rect_largo_izq, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_rect_largo_izq, mat_rect_largo_izq, vec3.fromValues(4, 0.6, 1));
 	rect_largo_izq.applyMatrix(mat_rect_largo_izq);
 	
-	var rect_largo_der = new Mesh( new Cuadrado() );
+	var rect_largo_der = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	rect_largo_der.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_rect_largo_der = mat4.create();
 	mat4.translate(mat_rect_largo_der, mat_rect_largo_der, vec3.fromValues(-1, 0, 0));
 	mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI/2, vec3.fromValues(0, 1, 0));
@@ -217,14 +237,16 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_rect_largo_der, mat_rect_largo_der, Math.PI, vec3.fromValues(1, 0, 0));
 	rect_largo_der.applyMatrix(mat_rect_largo_der);
 	
-	var rect_largo_adelante = new Mesh( new Cuadrado() );
+	var rect_largo_adelante = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	rect_largo_adelante.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_rect_largo_adelante = mat4.create();
 	mat4.translate(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(0, 0, 2));
 	//mat4.rotate(mat_rect_largo_adelante, mat_rect_largo_adelante, Math.PI/2, vec3.fromValues(0, 1, 0));
 	mat4.scale(mat_rect_largo_adelante, mat_rect_largo_adelante, vec3.fromValues(2, 0.6, 1));
 	rect_largo_adelante.applyMatrix(mat_rect_largo_adelante);
 	
-	var rect_largo_atras = new Mesh( new Cuadrado() );
+	var rect_largo_atras = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	rect_largo_atras.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_rect_largo_atras = mat4.create();
 	mat4.translate(mat_rect_largo_atras, mat_rect_largo_atras, vec3.fromValues(0, 0, -2));
 	//mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI/2, vec3.fromValues(0, 1, 0));
@@ -232,7 +254,8 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_rect_largo_atras, mat_rect_largo_atras, Math.PI, vec3.fromValues(1, 0, 0));
 	rect_largo_atras.applyMatrix(mat_rect_largo_atras);
 	
-	var triang1 = new Mesh( new Triangulo() );
+	var triang1 = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_cuadrado_a_triangulo, new Triangulo(), 1, true, 0.5, 1, 0.5);
+	triang1.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_triang1 = mat4.create();
 	mat4.translate(mat_triang1, mat_triang1, vec3.fromValues(0, 0.5*0.6, -2));
 	mat4.rotate(mat_triang1, mat_triang1, Math.PI/2.85, vec3.fromValues(1, 0, 0));
@@ -241,7 +264,8 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_triang1, mat_triang1, Math.PI, vec3.fromValues(1, 0, 0));
 	triang1.applyMatrix(mat_triang1);
 	
-	var triang2 = new Mesh( new Triangulo() );
+	var triang2 = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_cuadrado_a_triangulo, new Triangulo(), 1, true, 0.5, 1, 0.5);
+	triang2.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_triang2 = mat4.create();
 	mat4.translate(mat_triang2, mat_triang2, vec3.fromValues(0, 0.5*0.6, 2));
 	mat4.rotate(mat_triang2, mat_triang2, -Math.PI/2.85, vec3.fromValues(1, 0, 0));
@@ -249,7 +273,8 @@ Cabina.cabinaTecho = function(){
 	mat4.scale(mat_triang2, mat_triang2, vec3.fromValues(2.236, 2, 1));
 	triang2.applyMatrix(mat_triang2);
 	
-	var triang3 = new Mesh( new Triangulo() );
+	var triang3 = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_cuadrado_a_triangulo, new Triangulo(), 1, true, 0.5, 1, 0.5);
+	triang3.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_triang3 = mat4.create();
 	mat4.translate(mat_triang3, mat_triang3, vec3.fromValues(-1, 0.5*0.6, 0));
 	mat4.rotate(mat_triang3, mat_triang3, -Math.PI/4, vec3.fromValues(0, 0, 1));
@@ -259,7 +284,8 @@ Cabina.cabinaTecho = function(){
 	mat4.rotate(mat_triang3, mat_triang3, Math.PI, vec3.fromValues(1, 0, 0));
 	triang3.applyMatrix(mat_triang3);
 	
-	var triang4 = new Mesh( new Triangulo() );
+	var triang4 = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_cuadrado_a_triangulo, new Triangulo(), 1, true, 0.5, 1, 0.5);
+	triang4.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_triang4 = mat4.create();
 	mat4.translate(mat_triang4, mat_triang4, vec3.fromValues(1, 0.5*0.6, 0));
 	mat4.rotate(mat_triang4, mat_triang4, Math.PI/4, vec3.fromValues(0, 0, 1));
@@ -301,7 +327,8 @@ Cabina.cabinaTechoParedes = function(paredes, techo){
 }
 
 Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso_plano){
-	if(piso_izq === undefined) piso_izq = new Mesh( new Trapecio(7) );
+	if(piso_izq === undefined) piso_izq = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Trapecio(7), 1, true, 0.5, 1, 0.5);
+	piso_izq.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_izq = mat4.create();
 	mat4.translate(mat_izq, mat_izq, vec3.fromValues(0, 0, 1));
 	mat4.rotate(mat_izq, mat_izq, 0.4646, vec3.fromValues(0, 1, 0));
@@ -309,7 +336,8 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.translate(mat_izq, mat_izq, vec3.fromValues(0.5, 0, 0));
 	piso_izq.applyMatrix(mat_izq);
 
-	if(piso_der === undefined) piso_der = new Mesh( new Trapecio(7) );
+	if(piso_der === undefined) piso_der = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Trapecio(7), 1, true, 0.5, 1, 0.5);
+	piso_der.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_der= mat4.create();
 	mat4.translate(mat_der, mat_der, vec3.fromValues(0, 0, -1));
 	mat4.rotate(mat_der, mat_der, -0.4646, vec3.fromValues(0, 1, 0));
@@ -318,7 +346,8 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(1, 0, 0));
 	piso_der.applyMatrix(mat_der);
 
-	if(piso_atras === undefined) piso_atras = new Mesh( new Trapecio(7) );
+	if(piso_atras === undefined) piso_atras = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Trapecio(7), 1, true, 0.5, 1, 0.5);
+	piso_atras.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_atras = mat4.create();
 	mat4.translate(mat_atras, mat_atras, vec3.fromValues(0, 2, 0));
 	mat4.rotate(mat_atras, mat_atras, -0.785, vec3.fromValues(0, 0, 1));
@@ -328,7 +357,8 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.rotate(mat_atras, mat_atras, Math.PI, vec3.fromValues(1, 0, 0));
 	piso_atras.applyMatrix(mat_atras);
 
-	if(piso_adelante === undefined) piso_adelante = new Mesh( new Trapecio(7) );
+	if(piso_adelante === undefined) piso_adelante = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Trapecio(7), 1, true, 0.5, 1, 0.5);
+	piso_adelante.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_adelante = mat4.create();
 	mat4.translate(mat_adelante, mat_adelante, vec3.fromValues(0, -2, 0));
 	mat4.rotate(mat_adelante, mat_adelante, 0.785, vec3.fromValues(0, 0, 1));
@@ -337,7 +367,8 @@ Cabina.cabinaPiso = function(piso_izq, piso_der, piso_atras, piso_adelante, piso
 	mat4.translate(mat_adelante, mat_adelante, vec3.fromValues(0.5, 0, 0));
 	piso_adelante.applyMatrix(mat_adelante);
 
-	if(piso_plano === undefined) piso_plano = new Mesh( new Cuadrado() );
+	if(piso_plano === undefined) piso_plano = new TexturedMesh( "AluminumTubing-ColorMap.png", TexturedMesh.mapper_piso_rotado, new Cuadrado(), 1, true, 0.5, 1, 0.5);
+	piso_plano.loadNormalTexture("AluminumTubing-NormalMap.png");
 	var mat_plano = mat4.create();
 	mat4.translate(mat_plano, mat_plano, vec3.fromValues(0.5, 0, 0));
 	mat4.rotate(mat_plano, mat_plano, Math.PI/2, vec3.fromValues(0, 1, 0));

@@ -10,7 +10,7 @@ var Geometry = function() {
 	}
 	
 	// hay generacion de indices para TRINANGLE_STRIP y TRIANGLES
-	this.draw_mode = gl.TRIANGLE_STRIP;
+	this.draw_mode = gl.TRIANGLES;
 	
 	// buffers
 	this.position_buffer = [];
@@ -25,6 +25,13 @@ var Geometry = function() {
 	this.webgl_color_buffer = null;
 	this.webgl_index_buffer = null;
 	this.webgl_normals_buffer = null;
+	
+	// para mapa de normales
+	this.tangent_buffer = null;
+	this.binormal_buffer = null;
+	
+	this.webgl_tangent_buffer = null;
+	this.webgl_binormal_buffer = null;
 }
 
 Geometry.prototype = {
@@ -192,7 +199,7 @@ Geometry.prototype = {
 		}
 		//this.webgl_color_buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_color_buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);   
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.color_buffer), gl.STATIC_DRAW);
 	},
 	
 	// Esta función crea e incializa los buffers dentro del pipeline para luego
@@ -222,7 +229,21 @@ Geometry.prototype = {
 		// Repetimos los pasos 1. 2. y 3. para la información de las normales
 		this.webgl_normals_buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_normals_buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals_buffer), gl.STATIC_DRAW);  
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals_buffer), gl.STATIC_DRAW); 
+		
+		// Repetimos los pasos 1. 2. y 3. para la información de las normales
+		if(this.tangent_buffer != null){
+			this.webgl_tangent_buffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_tangent_buffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.tangent_buffer), gl.STATIC_DRAW);
+		}
+		
+		// Repetimos los pasos 1. 2. y 3. para la información de las normales
+		if(this.binormal_buffer != null){
+			this.webgl_binormal_buffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_binormal_buffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.binormal_buffer), gl.STATIC_DRAW);
+		}
 	},
 
 
@@ -259,6 +280,20 @@ Geometry.prototype = {
 		gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals_buffer), gl.STATIC_DRAW);
 		
+		if(this.webgl_tangent_buffer != null){
+			var vertexTangentAttribute = gl.getAttribLocation(glProgram, "aVertexTangent");
+			gl.enableVertexAttribArray(vertexTangentAttribute);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_tangent_buffer);
+			gl.vertexAttribPointer(vertexTangentAttribute, 3, gl.FLOAT, false, 0, 0);
+		}
+		
+		if(this.webgl_binormal_buffer != null){
+			var vertexBinormalAttribute = gl.getAttribLocation(glProgram, "aVertexBinormal");
+			gl.enableVertexAttribArray(vertexBinormalAttribute);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.webgl_binormal_buffer);
+			gl.vertexAttribPointer(vertexBinormalAttribute, 3, gl.FLOAT, false, 0, 0);
+		}
+		
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.webgl_index_buffer);
 
 		// Dibujamos.
@@ -266,5 +301,7 @@ Geometry.prototype = {
 		gl.disableVertexAttribArray(vertexPositionAttribute);
 		gl.disableVertexAttribArray(vertexColorAttribute);
 		gl.disableVertexAttribArray(vertexNormalAttribute);
+		gl.disableVertexAttribArray(vertexTangentAttribute);
+		gl.disableVertexAttribArray(vertexBinormalAttribute);
 	}
 }

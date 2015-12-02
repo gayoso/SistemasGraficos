@@ -9,6 +9,8 @@ var Trapecio = function(_angulo){
 	this.setCols();
 	
 	Geometry.call(this, this.gridType);
+	this.tangent_buffer = [];
+	this.binormal_buffer = [];
 	this.init();
 }
 
@@ -55,6 +57,14 @@ Trapecio.prototype.createTrapecioGrid = function(){
 			this.normals_buffer.push(0);
 			this.normals_buffer.push(0);
 			this.normals_buffer.push(1);
+			
+			this.tangent_buffer.push(1);
+			this.tangent_buffer.push(0);
+			this.tangent_buffer.push(0);
+			
+			this.binormal_buffer.push(0);
+			this.binormal_buffer.push(1);
+			this.binormal_buffer.push(0);
 		};
 	};
 	

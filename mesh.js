@@ -116,23 +116,24 @@ Mesh.prototype.render = function(m){
 	
 	this.geometry.drawVertexGrid(m_final);
 	
-	Conjunto.prototype.render.call(this);
+	Conjunto.prototype.render.call(this, m);
 };
 
 Mesh.prototype.add = function(object){
 	if(object instanceof Geometry){
 		this.geometry = object;
 	} else {
-		Conjunto.prototype.add.call(this, object);
+		//Conjunto.prototype.add.call(this, object);
+		throw new Error("Mesh solo puede contener una geometria");
 	}
 };
 
 // modifica los vertices segun una matriz de escala+rotacion+traslacion
-Mesh.prototype.applyMatrix = function(m){
+/*Mesh.prototype.applyMatrix = function(m){
 	//this.geometry.applyMatrix(m);
 	//mat4.multiply(this.matrix_local, m, this.matrix_local);
 	Conjunto.prototype.applyMatrix.call(this, m);
-};
+};*/
 
 Mesh.prototype.getCenter = function(m){
 	if(m === undefined) m = mat4.create();
@@ -148,6 +149,6 @@ Mesh.prototype.getCenter = function(m){
 };
 
 Mesh.prototype.setColor = function(color){
-	Conjunto.prototype.setColor.call(this);
+	//Conjunto.prototype.setColor.call(this);
 	this.geometry.setColor(color);
 };
