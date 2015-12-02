@@ -8,6 +8,7 @@
 	</style>
 
 	<script type="text/javascript" src="gl-matrix.js"></script>
+	<script type="text/javascript" src="reflectionmanager.js"></script>
 	<script type="text/javascript" src="color.js"></script>
 	<script type="text/javascript" src="timer.js"></script>
 	<script type="text/javascript" src="geometry.js"></script>
@@ -57,8 +58,6 @@
 		uniform mat4 uVMatrix;
 		uniform mat4 uPMatrix;
 		uniform mat4 uNMatrix;
-		
-		//uniform bool uUseReflection;
 
 		// Los varying son propiedades que toman valor para cada fragmento a partir
 		// de interpolar linealmente entre los valores que se les asigna en cada 
@@ -69,7 +68,6 @@
 		varying vec3 vBinormal;
 		varying vec3 vertPos;
 		varying vec2 vTextureCoord;
-		//varying vec3 reflectDir;
 		
 		void main(void) {
 			// gl_Position es una variable "built-in" de GLSL que es usada para 
@@ -81,12 +79,6 @@
 			vBinormal = normalize(vec3(uNMatrix * vec4(normalize(aVertexBinormal), 0.0)));
 			vTangente = normalize(vec3(uNMatrix * vec4(normalize(aVertexTangent), 0.0)));
 			vTextureCoord = aTextureCoord;
-			
-			/*if (uUseReflection) {
-				vec3 view = normalize(vertPos);
-				reflectDir = reflect(view, vNormal);
-				//reflectDir = vec3(uInverseVMatrix * vec4(reflectDir, 0.0));
-			}*/
 		}
 	</script>
 
@@ -140,7 +132,7 @@
 		
 		uniform sampler2D uSampler;
 		uniform sampler2D uNormalSampler;
-		uniform sampler2D uReflectionSampler;
+		uniform samplerCube uCubeSampler;
 		
 		void main() {
 			
@@ -184,12 +176,14 @@
 				return;
 			}
 			
-			/*if(uUseReflection){
-				vec3 reflDir = reflect(uViewPos, normal);
-				reflDir = vec3(reflDir.x, -reflDir.z, reflDir.y);
-				vec3 reflColor = texture2D(uReflectionSampler, reflDir).rgb * color;
-				color = mix(color, reflColor, uReflectiveness);
-			}*/
+			if (uUseReflection) {
+
+				//vec3 eyeDirection = normalize(-vPosition.xyz);
+				//vec3 lookup = reflect(eyeDirection, normal);
+				vec3 lookup = reflect(viewDir, normal);
+				color = mix(color, vec3(textureCube(uCubeSampler, -lookup)), 0.7);
+				//color *= vec3(textureCube(uCubeSampler, -lookup));
+			}
 			
 			vec3 color_final = vec3(0.0, 0.0, 0.0);
 			
@@ -525,6 +519,22 @@
 
 			// Le decimos a WebGL que de aquí en adelante use el programa generado.
 			gl.useProgram(glProgram);
+			
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseWaterEffect"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uBlendTexture"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseNormalMap"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uHasTexture"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseLights"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uSampler"), 0);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uNormalSampler"), 1);
+			gl.uniform1i(gl.getUniformLocation(glProgram, "uCubeSampler"), 2);
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
 		}
 		
 		function makeShader(src, type)
@@ -541,7 +551,17 @@
 		}
 		
 		function setupBuffers()
-		{
+		{	
+			var cubeFaces = [
+				["xpos.png", gl.TEXTURE_CUBE_MAP_POSITIVE_X],
+				["xneg.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
+				["ypos.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Y],
+				["yneg.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+				["zpos.png", gl.TEXTURE_CUBE_MAP_POSITIVE_Z],
+				["zneg.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
+			];
+			ReflectionManager.addReflectionCubeMap(cubeFaces, "background");
+			
 			/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
 			/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
 			vuelta_al_mundo = new VueltaAlMundo();
@@ -631,26 +651,6 @@
 										vec3.fromValues(0.5, 0.5, 0.5)));*/
 			
 			/*** ESTO DEFINE LA GEOMETRIA DEL PISO, SU TEXTURA Y COMO MAPEARLA ***/	
-			
-			/*var mapper_agua = function(){
-				var cant_tiles = 20;
-				var buffer = [];
-				
-				buffer.push(0);
-				buffer.push(0);
-				
-				buffer.push(cant_tiles);
-				buffer.push(0);
-				
-				buffer.push(0);
-				buffer.push(cant_tiles);
-				
-				buffer.push(cant_tiles);
-				buffer.push(cant_tiles);
-				
-				return buffer;
-			}*/
-
 			agua = new Agua();
 			var m_agua = mat4.create();
 			mat4.translate(m_agua, m_agua, vec3.fromValues(0, -15.1, 0));
@@ -669,8 +669,7 @@
 			escena.addConjunto(piso);
 			
 			/*** ESTO DEFINE LA GEOMETRIA DEL CIELO, SU TEXTURA Y COMO MAPEARLA ***/
-			
-			cielo = new TexturedMesh("sky.jpg", TexturedMesh.mapper_cielo, new Esfera(), false, false);
+			cielo = new TexturedMesh("sky2.jpg", TexturedMesh.mapper_cielo, new Esfera(), false, false);
 			var m_cielo = mat4.create();
 			mat4.translate(m_cielo, m_cielo, vec3.fromValues(0, -15, 0));
 			mat4.scale(m_cielo, m_cielo, vec3.fromValues(500, 500, 500));
@@ -685,6 +684,8 @@
 			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 			sillas_giratorias.setTransform(m2);
 			escena.addConjunto(sillas_giratorias);
+			
+			ReflectionManager.addReflectionToRenderable(agua, "background");
 		}
 		
 		function drawScene()

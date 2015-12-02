@@ -147,6 +147,7 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	// corro rueda y soporte a izq
 	rueda_izq = VueltaAlMundo.rueda_vigas();
 	soporte_izq = VueltaAlMundo.soporte();
+	ReflectionManager.addReflectionToRenderable(soporte_izq, "background");
 	
 	mat_izq = mat4.create();
 	mat4.translate(mat_izq, mat_izq, vec3.fromValues(-1, 0, 0));
@@ -162,11 +163,13 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(0, 1, 0));
 	rueda_der.applyMatrix(mat_der);
 	soporte_der.applyMatrix(mat_der);
+	ReflectionManager.addReflectionToRenderable(soporte_der, "background");
 	
 	// conjunto de lo que va a girar
 	ruedas = new Conjunto();
 	ruedas.add(rueda_izq);
 	ruedas.add(rueda_der);
+	ReflectionManager.addReflectionToRenderable(ruedas, "background");
 	
 	// vuelta al mundo
 	ruedas_y_soportes = new Conjunto();
