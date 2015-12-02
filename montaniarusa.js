@@ -48,9 +48,25 @@ var MontaniaRusa = function(){
 		var puntoNuevo = vec3.create();
 		vec3.add(puntoNuevo, puntoBase, binormal);
 		puntosInterior.push(puntoNuevo);
-		var puntoNuevo = vec3.create();
-		vec3.subtract(puntoNuevo, puntoBase, binormal);
-		puntosExterior.push(puntoNuevo);
+		var otroPunto = vec3.create();
+		vec3.subtract(otroPunto, puntoBase, binormal);
+		puntosExterior.push(otroPunto);
+		var baseMasDerivada = vec3.create();
+		vec3.normalize(derivada, derivada);
+		vec3.scale(derivada, derivada, 10);
+		var baseMasDerivadaSobreDos = vec3.create();
+		vec3.add(baseMasDerivadaSobreDos, baseMasDerivadaSobreDos, derivada);
+		vec3.scale(baseMasDerivadaSobreDos, baseMasDerivadaSobreDos, 0.5);
+		vec3.add(baseMasDerivadaSobreDos, baseMasDerivadaSobreDos, puntoBase);
+		vec3.add(baseMasDerivada, puntoBase, derivada);
+		var puntosDerivada = [puntoBase, baseMasDerivadaSobreDos, baseMasDerivada];
+		var flechaDerivada = new Mesh(new Curva(puntosDerivada));
+		var matriz = mat4.create();
+		var c = curva.getCenter();
+		vec3.scale(c, c, -1);
+		mat4.translate(matriz, matriz, c);
+		flechaDerivada.setTransform(matriz);
+		this.add(flechaDerivada);
 	}
 	
 	this.curva1 = new Mesh( new Curva(puntosInterior) );
