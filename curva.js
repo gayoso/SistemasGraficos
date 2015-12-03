@@ -156,6 +156,12 @@ Curva.prototype.createCurveGrid = function(){
 	var ultimo_punto = vec3.fromValues(x[this.puntos.length-1], y[this.puntos.length-1], z[this.puntos.length-1]);
 	this.putSlice(ultimo_punto, Color.RANDOM());
 	this.rows++;
+	
+	for(var i = 0; i < this.position_buffer.length; ++i){
+		this.normals_buffer.push(0);
+		this.normals_buffer.push(0);
+		this.normals_buffer.push(1);
+	}
 }
 
 Curva.prototype.putSlice = function(bezier_point, color){

@@ -705,8 +705,12 @@
 			
 			/*** CREO LA ESCENA ***/
 			escena = new Scene();
-			escena.addConjunto(vuelta_al_mundo);
-			
+			//escena.addConjunto(vuelta_al_mundo);
+			var m4 = mat4.create();
+			mat4.translate(m4, m4, vec3.fromValues(0, 2, 0));
+			montania_rusa.applyMatrix(m4);
+			escena.addConjunto(montania_rusa);
+			//escena.addConjunto(vuelta_al_mundo);
 
 			// esta es una luz blanca de arriba (de infinito)
 			light_dia = new DirectionalLight(vec3.fromValues(0.0, 1, 0.0), 
@@ -790,7 +794,7 @@
 			mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 			sillas_giratorias.setTransform(m2);
-			escena.addConjunto(sillas_giratorias);
+			//escena.addConjunto(sillas_giratorias);
 			
 			// Preparamos una matriz de perspectiva.
 			var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
