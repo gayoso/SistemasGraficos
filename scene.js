@@ -19,11 +19,44 @@ Scene.prototype = {
 		this.conjuntos.push(conj);
 	},
 	
+	removeConjunto: function(conj){
+		var index = this.conjuntos.indexOf(conj);
+		if(index > -1){
+			this.conjuntos.splice(index, 1);
+		}
+	},
+	
 	addLight: function(light){
 		if(this.lights.length == 50){
 			throw new Error("Se llego al maximo de luces");
 		}
 		this.lights.push(light);
+	},
+	
+	removeLight: function(light){
+		var index = this.lights.indexOf(light);
+		if(index > -1){
+			this.lights[index].resetUniforms(index);
+			this.lights.splice(index, 1);
+		}
+	},
+	
+	turnOffLight: function(light){
+		var index = this.lights.indexOf(light);
+		if(index > -1){
+			this.lights[index].turnOff();
+			/*this.lights[index].resetUniforms(index);
+			this.lights.splice(index, 1);*/
+		}
+	},
+	
+	turnOnLight: function(light){
+		var index = this.lights.indexOf(light);
+		if(index > -1){
+			this.lights[index].turnOn();
+			/*this.lights[index].resetUniforms(index);
+			this.lights.splice(index, 1);*/
+		}
 	},
 	
 	render: function(){

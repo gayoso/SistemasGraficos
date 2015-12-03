@@ -11,16 +11,29 @@ var PointLight = function(ppos, iip, iia) {
 	this.pos = vec3.create();
 	this.ip = vec3.create();
 	this.ia = vec3.create();
+	this.on = true;
 	
 	if(ppos === undefined)
 		ppos = vec3.fromValues(0.0, 0.0, 0.0);
 	vec3.copy(this.pos, ppos);
 	
-	this.lamparita = new Mesh( new Esfera() );
+	this.lamparita = new Conjunto();
+	this.bombilla = new Mesh( new Esfera() );
+	this.bombilla.setColor(Color.BLACK);
+	this.soporte = new Mesh( new Cilindro() );
+	this.lamparita.add(this.bombilla);
+	this.lamparita.add(this.soporte);
+	var m_sop = mat4.create();
+	mat4.translate(m_sop, m_sop, vec3.fromValues(0, -5.5, 0));
+	mat4.scale(m_sop, m_sop, vec3.fromValues(0.7, 10.0, 0.7));
+	mat4.rotate(m_sop, m_sop, Math.PI/2, vec3.fromValues(1, 0, 0));
+	this.soporte.applyMatrix(m_sop);
+	this.soporte.setColor(Color.BLACK);
+	
 	var m_pos = mat4.create();
 	mat4.translate(m_pos, m_pos, this.pos);
-	mat4.scale(m_pos, m_pos, vec3.fromValues(2.0, 2.0, 2.0));
-	this.lamparita.setTransform(m_pos);
+	mat4.scale(m_pos, m_pos, vec3.fromValues(0.5, 0.5, 0.5));
+	this.lamparita.applyMatrix(m_pos);
 	
 	if(iip === undefined)
 		iip = vec3.fromValues(1.0, 1.0, 1.0);
@@ -36,6 +49,13 @@ PointLight.prototype = {
 }
 
 PointLight.prototype.render = function(i){
+	this.lamparita.render();
+
+	if(!this.on){
+		this.resetUniforms(i);
+		return;
+	}
+	
 	var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "position");
 	gl.uniform3fv(u_location, this.pos);
 	
@@ -43,7 +63,24 @@ PointLight.prototype.render = function(i){
 	gl.uniform3fv(u_location, this.ia);
 	
 	u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
-	gl.uniform3fv(u_location, this.ip);
+	gl.uniform3fv(u_location, this.ip);	
+}
+
+PointLight.prototype.resetUniforms = function(i){
 	
-	this.lamparita.render();
+	var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient");
+	gl.uniform3fv(u_location, [0, 0, 0]);
+	
+	u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
+	gl.uniform3fv(u_location, [0, 0, 0]);
+}
+
+PointLight.prototype.turnOn = function(){
+	this.on = true;
+	this.bombilla.setColor(Color.WHITE);
+}
+
+PointLight.prototype.turnOff = function(){
+	this.on = false;
+	this.bombilla.setColor(Color.Gray80);
 }

@@ -3,7 +3,7 @@ MESH
 Esta clase es en definitiva un 'Conjunto' que tiene un objeto 'Geometry'
 ****************************************/
 
-var Mesh = function(geometry, use_lights, ka, kd, ks, shininess, color, color_specular){
+var Mesh = function(geometry, use_lights, ka, kd, ks, shininess, color, color_specular, reflectiveness){
 	Conjunto.call(this);
 	
 	this.geometry = geometry;
@@ -37,6 +37,10 @@ var Mesh = function(geometry, use_lights, ka, kd, ks, shininess, color, color_sp
 	this.use_lights = use_lights;
 	// no tiene textura, para eso es TexturedMesh
 	this.has_texture = false;
+	
+	if(reflectiveness === undefined)
+		reflectiveness = 0.0;
+	this.reflectiveness = reflectiveness;
 }
 
 Mesh.prototype = Object.create(Conjunto.prototype);
@@ -65,6 +69,11 @@ Mesh.prototype.setKs = function(ks){
 Mesh.prototype.setShininess = function(shininess){
 	Conjunto.prototype.setShininess.call(this);
 	this.shininess = shininess;
+}
+
+Mesh.prototype.setReflectiveness = function(ref){
+	Conjunto.prototype.setReflectiveness.call(this);
+	this.reflectiveness = ref;
 }
 
 Mesh.prototype.setUseLights = function(u){
@@ -107,6 +116,9 @@ Mesh.prototype.render = function(m){
 	
 	var u_shininess = gl.getUniformLocation(glProgram, "uShininess");
 	gl.uniform1f(u_shininess, this.shininess);
+	
+	var u_reflectiveness = gl.getUniformLocation(glProgram, "uReflectiveness");
+	gl.uniform1f(u_reflectiveness, this.reflectiveness);
 	
 	var u_use_lights = gl.getUniformLocation(glProgram, "uUseLights");
 	gl.uniform1i(u_use_lights, this.use_lights);

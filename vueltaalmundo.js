@@ -10,6 +10,7 @@ var VueltaAlMundo = function(){
 	this.cabinas = v[0];
 	this.lo_que_gira = v[1];
 	this.vuelta_al_mundo = v[2];
+	this.cosas_con_reflexion = v[3];
 
 	this.timer = new Timer();
 	this.timer.start();
@@ -43,6 +44,14 @@ VueltaAlMundo.prototype.girar = function(){
 		cabina.setTransform(mat_cab);
 	}
 	this.lo_que_gira.setTransform(m1);
+}
+
+VueltaAlMundo.prototype.setReflectionTextureName = function(name){
+	ReflectionManager.addReflectionToRenderable(this.cosas_con_reflexion, name);
+}
+
+VueltaAlMundo.prototype.setReflectiveness = function(ref){
+	this.cosas_con_reflexion.setReflectiveness(ref);
 }
 
 VueltaAlMundo.rueda_vigas = function(){
@@ -143,11 +152,14 @@ VueltaAlMundo.soporte = function(){
 }
 
 VueltaAlMundo.vuelta_al_mundo = function(){
+	var cosas_con_reflexion = new Conjunto();
+	
 	var factor_escala = 0.10;
 	// corro rueda y soporte a izq
 	rueda_izq = VueltaAlMundo.rueda_vigas();
 	soporte_izq = VueltaAlMundo.soporte();
-	ReflectionManager.addReflectionToRenderable(soporte_izq, "background");
+	cosas_con_reflexion.add(soporte_izq);
+	//ReflectionManager.addReflectionToRenderable(soporte_izq, "background_night");
 	
 	mat_izq = mat4.create();
 	mat4.translate(mat_izq, mat_izq, vec3.fromValues(-1, 0, 0));
@@ -157,26 +169,29 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	// corro rueda y soporte a der
 	rueda_der = VueltaAlMundo.rueda_vigas();
 	soporte_der = VueltaAlMundo.soporte();
+	cosas_con_reflexion.add(soporte_der);
 	
 	mat_der = mat4.create();
 	mat4.translate(mat_der, mat_der, vec3.fromValues(1, 0, 0));
 	mat4.rotate(mat_der, mat_der, Math.PI, vec3.fromValues(0, 1, 0));
 	rueda_der.applyMatrix(mat_der);
 	soporte_der.applyMatrix(mat_der);
-	ReflectionManager.addReflectionToRenderable(soporte_der, "background");
+	//ReflectionManager.addReflectionToRenderable(soporte_der, "background_night");
 	
 	// conjunto de lo que va a girar
 	ruedas = new Conjunto();
 	ruedas.add(rueda_izq);
 	ruedas.add(rueda_der);
-	ReflectionManager.addReflectionToRenderable(ruedas, "background");
+	//ReflectionManager.addReflectionToRenderable(ruedas, "background_night");
 	
 	// vuelta al mundo
 	ruedas_y_soportes = new Conjunto();
-	ruedas_y_soportes.add(ruedas);
-	ruedas_y_soportes.add(soporte_izq);
-	ruedas_y_soportes.add(soporte_der);	
-	ruedas_y_soportes.setColor(Color.WHITE);
+	//ruedas_y_soportes.add(ruedas);
+	cosas_con_reflexion.add(ruedas);
+	cosas_con_reflexion.add(soporte_izq);
+	cosas_con_reflexion.add(soporte_der);	
+	cosas_con_reflexion.setColor(Color.WHITE);
+	//ruedas_y_soportes.setReflectiveness(0.4);
 	
 	// cabinas y soportes horizontales
 	cabinas = new Conjunto();
@@ -215,8 +230,10 @@ VueltaAlMundo.vuelta_al_mundo = function(){
 	mat4.scale(mat_bolt, mat_bolt, vec3.fromValues(0.35, 0.35, 3.5));
 	bolt.applyMatrix(mat_bolt);
 	bolt.setColor(Color.WHITE);
-	ruedas.add(bolt);
+	//bolt.setReflectiveness(0.4);
+	cosas_con_reflexion.add(bolt);
+	ruedas_y_soportes.add(cosas_con_reflexion);
 	ruedas_y_soportes.add(cabinas);
 	
-	return [cabinas, ruedas, ruedas_y_soportes];
+	return [cabinas, ruedas, ruedas_y_soportes, cosas_con_reflexion];
 }

@@ -6,7 +6,7 @@ Tambien permite agregarle reflexion a un objeto que tenga la funcionalidad 'rend
 
 var reflectionCubes = new Array;
 var objectsOriginalRender = new Array;
-
+var objects = new Array;
 
 var ReflectionManager = function(){
 	
@@ -59,7 +59,13 @@ ReflectionManager.getReflectionCubeMap = function(name){
 
 ReflectionManager.addReflectionToRenderable = function(object, reflection_name){	
 	var originalRender = object["render"];
-	objectsOriginalRender[object];
+	var i = objects.indexOf(object);
+	if(i == -1){
+		objects.push(object);
+		objectsOriginalRender.push(originalRender);
+	} else {
+		originalRender = objectsOriginalRender[i];
+	}
 	
 	object["render"] = function() {
 		gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), true);

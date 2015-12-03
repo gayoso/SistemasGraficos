@@ -264,7 +264,7 @@ TexturedMesh.prototype.initBuffers = function(){
 };
 
 TexturedMesh.prototype.render = function(m){
-	var m_final = mat4.create();
+	/*var m_final = mat4.create();
 	if(m === undefined) m = mat4.create();
 	mat4.multiply(m_final, m, this.matrix_local);
 	
@@ -287,7 +287,7 @@ TexturedMesh.prototype.render = function(m){
 	gl.uniform1i(u_use_lights, this.use_lights);
 	
 	var u_has_texture = gl.getUniformLocation(glProgram, "uHasTexture");
-	gl.uniform1i(u_has_texture, this.has_texture);
+	gl.uniform1i(u_has_texture, this.has_texture);*/
 	
 	var textureCoordAttribute = gl.getAttribLocation(glProgram, "aTextureCoord");
 	gl.enableVertexAttribArray(textureCoordAttribute);
@@ -307,7 +307,8 @@ TexturedMesh.prototype.render = function(m){
 		gl.bindTexture(gl.TEXTURE_2D, this.texture_normals);
 	}
 	
-	this.geometry.drawVertexGrid(m_final);
+	//this.geometry.drawVertexGrid(m_final);
+	Mesh.prototype.render.call(this, m);
 	gl.disableVertexAttribArray(textureCoordAttribute);
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, null);

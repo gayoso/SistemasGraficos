@@ -144,5 +144,11 @@ Conjunto.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 			this.children[i].setShininess(shininess);
 		}
+	},
+	
+	setReflectiveness: function(ref){
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.children[i].setReflectiveness(ref);
+		}
 	}
 }

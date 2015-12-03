@@ -10,6 +10,7 @@ var DirectionalLight = function(dir, iip, iia) {
 	this.dir = vec3.create();
 	this.ip = vec3.create();
 	this.ia = vec3.create();
+	this.on = true;
 	
 	if(dir === undefined)
 		dir = vec3.fromValues(0.0, 0.0, 1.0);
@@ -35,6 +36,11 @@ DirectionalLight.prototype = {
 }
 
 DirectionalLight.prototype.render = function(i){
+	if(!this.on){
+		this.resetUniforms(i);
+		return;
+	}
+	
 	var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "direction");
 	gl.uniform3fv(u_location, this.dir);
 	
@@ -45,4 +51,20 @@ DirectionalLight.prototype.render = function(i){
 	gl.uniform3fv(u_location, this.ip);
 	
 	//this.lamparita.render();
+}
+
+DirectionalLight.prototype.resetUniforms = function(i){
+	var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient");
+	gl.uniform3fv(u_location, [0, 0, 0]);
+	
+	u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity");
+	gl.uniform3fv(u_location, [0, 0, 0]);
+}
+
+DirectionalLight.prototype.turnOn = function(){
+	this.on = true;
+}
+
+DirectionalLight.prototype.turnOff = function(){
+	this.on = false;
 }

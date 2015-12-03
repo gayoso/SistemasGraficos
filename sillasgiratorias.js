@@ -48,16 +48,18 @@ var SillasGiratorias = function(){
 	/*****************/
 	
 	this.add( this.sillas_giratorias );
+	this.sillas_giratorias.setKs(0.0);
+	this.sillas.setKs(1.0);
 }
 
 SillasGiratorias.prototype = Object.create(Conjunto.prototype);
 SillasGiratorias.prototype.constructor = SillasGiratorias;
 
 SillasGiratorias.prototype.girar = function(){
-	var time = this.timer.elapsed_seconds() % 60;
+	//var time = this.timer.elapsed_seconds() % 60;
 	// velocidad de rotacion, tiene una velocidad base y aumenta y disminuye
 	//console.log(time);
-	var vel_giro, vel_sillas, a, a_sillas, pos_giro, angulo_sillas;
+	/*var vel_giro, vel_sillas, a, a_sillas, pos_giro, angulo_sillas;
 	if(time <= this.t02){
 		a = this.a_giro;
 		a_sillas = this.a_sillas;
@@ -123,7 +125,7 @@ SillasGiratorias.prototype.girar = function(){
 		this.ultimo_angulo_sillas = angulo_sillas;
 		
 		//console.log("3. vel: %s, pos: %s", vel_sillas, angulo_sillas);
-	}
+	}*/
 	
 	for(var i = 0; i < 16; i++){
 		var mats = mat4.create();
@@ -132,7 +134,7 @@ SillasGiratorias.prototype.girar = function(){
 		
 		mat4.rotate(mats, mats, (1+2*i)*Math.PI/16, vec3.fromValues(0, 1, 0));
 		mat4.translate(mats, mats, vec3.fromValues(0, 0, 6.5));
-		mat4.rotate(mats, mats, -Math.PI/angulo_sillas, vec3.fromValues(1, 0, 0));
+		mat4.rotate(mats, mats, -Math.PI/7, vec3.fromValues(1, 0, 0));
 		mat4.translate(mats, mats, vec3.fromValues(0, -11, 0));
 		mat4.scale(mats, mats, vec3.fromValues(1, 2, 1.5));
 		
@@ -140,7 +142,7 @@ SillasGiratorias.prototype.girar = function(){
 	}
 	
 	var m1 = mat4.create();
-	mat4.rotate(m1, m1, pos_giro, vec3.fromValues(0, 1, 0));
+	mat4.rotate(m1, m1, this.timer.elapsed_miliseconds()/350, vec3.fromValues(0, 1, 0));
 	this.tope.setTransform(m1);
 }
 
@@ -160,7 +162,7 @@ SillasGiratorias.pilar = function(){
 	mat4.scale(matr2, matr2, vec3.fromValues(1, 1, 1));
 	cil2.applyMatrix(matr2);
 	
-	var cil3 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cilindro(), 1, true, 0.25, 0.5, 1, 2 );
+	var cil3 = new TexturedMesh( "wood_texture.jpg", TexturedMesh.mapper_sillas_columna, new Cilindro(), 1, true, 0.25, 0.5, 1);
 	//var cil3 = new Mesh( new Cilindro() );
 	var matr3 = mat4.create();
 	mat4.translate(matr3, matr3, vec3.fromValues(0, 3, 0));
