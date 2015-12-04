@@ -117,7 +117,6 @@ var MontaniaRusa = function(){
 	this.tablas = new Conjunto();
 	this.columnas = new Conjunto();
 	this.carrito = new Carrito();
-	this.add(this.carrito);
 	var curva = new Curva(this.puntos);
 	var derivadas = curva.getDerivada();
 	var j = 1;
@@ -227,7 +226,7 @@ var MontaniaRusa = function(){
 	//mat4.translate(m2, m2, vec3.fromValues(-1, 0,0));
 	this.curva2.setTransform(m2);
 	this.add(this.curva2);
-	
+	this.ultimoAngulo = 0;
 
 	
 }
@@ -256,14 +255,28 @@ MontaniaRusa.prototype.avanzar = function(){
 	var x = pendiente[0];
 	var y = pendiente[1];
 	var z = pendiente[2];
-	mat4.rotateY(mat, mat, Math.atan((x+0.001)/(z+0.001)));
+	mat4.rotateY(mat, mat, Math.PI/2);
+	var vecPendiente = vec2.fromValues(x, z);
+	var vecBase = vec2.fromValues(1, 0);
+	var dot = vec2.dot(vecPendiente, vecBase);
+	var angulo = Math.acos(dot/vec2.length(vecPendiente));
+	if(z < 0){
+		angulo = -angulo;
+	}
+	mat4.rotateY(mat, mat,  -angulo);
 	var binormal = vec3.create();
 	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
 	var adyacente = Math.pow(x*x+z*z,0.5);
-	mat4.rotate(mat, mat, Math.atan((y+0.001)/adyacente), binormal);
+	angulo = -Math.atan((y+0.001)/adyacente);
+	if (y > 0){
+		//angulo = -angulo;
+	} else {
+		angulo = -angulo;
+	}
+	mat4.rotate(mat, mat, angulo , binormal);
 
 	this.carrito.setTransform(mat);
 	this.add(this.carrito);
 	//this.add(this.curvaCentral)
-	
+
 }
