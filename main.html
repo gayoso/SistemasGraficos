@@ -440,6 +440,8 @@
 					escena.turnOnLight(light_noche6);
 					vuelta_al_mundo.setReflectionTextureName("background_night");
 					vuelta_al_mundo.setReflectiveness(0.4);
+					montania_rusa.setReflectionTextureName("background_night");
+					montania_rusa.setReflectiveness(0.4);
 				} else {
 					mode = "day";
 					
@@ -455,6 +457,8 @@
 					escena.turnOnLight(light_dia);
 					vuelta_al_mundo.setReflectionTextureName("background_day");
 					vuelta_al_mundo.setReflectiveness(0.7);
+					montania_rusa.setReflectionTextureName("background_day");
+					montania_rusa.setReflectiveness(0.7);
 				}
 			}
 			if(camara == 2){
@@ -754,7 +758,7 @@
 			vuelta_al_mundo.setReflectiveness(0.7);
 			//escena.addConjunto(vuelta_al_mundo);
 			
-			/*** carrito ***/
+			/*** CARRITO	 ***/
 			carrito = new Carrito();
 			escena.addConjunto(carrito);			
 			
@@ -763,7 +767,9 @@
 			var m4 = mat4.create();
 			mat4.translate(m4, m4, vec3.fromValues(0, 2, 0));
 			montania_rusa.applyMatrix(m4);
-			escena.addConjunto(montania_rusa);	
+			escena.addConjunto(montania_rusa);
+			montania_rusa.setReflectionTextureName("background_day");
+			montania_rusa.setReflectiveness(0.7);
 			
 			/*** SILLAS GIRATORIAS ***/
 			sillas_giratorias = new SillasGiratorias();

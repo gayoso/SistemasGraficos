@@ -194,15 +194,19 @@ var MontaniaRusa = function(){
 	}
 	this.add(this.tablas);
 	this.add(this.columnas);
+	this.columnas.setColor(Color.Gray90);
+	
 	this.curvaCentral = new Mesh(new Curva(this.puntos));
 	var m3 = mat4.create();
 	var centro = this.curvaCentral.getCenter();
 	vec3.scale(centro, centro, -1);
-
+	
+	this.curvas = new Conjunto();
+	
 	mat4.translate(m3,m3,centro);
 	mat4.translate(m3,m3,vec3.fromValues(0,-0.5,0));
 	this.curvaCentral.setTransform(m3);
-	this.add(this.curvaCentral)
+	this.curvas.add(this.curvaCentral)
 	
 	puntosInterior[puntosInterior.length - 1] = puntosInterior[0];
 	var rielInterior = new Curva(puntosInterior);
@@ -214,7 +218,7 @@ var MontaniaRusa = function(){
 	//vec3.scale(centro, centro, -1);
 	mat4.translate(m1, m1, centro);
 	this.curva1.setTransform(m1);
-	this.add(this.curva1); 
+	this.curvas.add(this.curva1); 
 
 	puntosExterior[puntosExterior.length - 1] = puntosExterior[0];
 	var rielExterior = new Curva(puntosExterior);
@@ -226,10 +230,8 @@ var MontaniaRusa = function(){
 	mat4.translate(m2, m2, centro);
 	//mat4.translate(m2, m2, vec3.fromValues(-1, 0,0));
 	this.curva2.setTransform(m2);
-	this.add(this.curva2);
-	
-
-	
+	this.curvas.add(this.curva2);
+	this.add(this.curvas);
 }
 
 MontaniaRusa.prototype.getTablas = function(){
@@ -266,4 +268,12 @@ MontaniaRusa.prototype.avanzar = function(){
 	this.add(this.carrito);
 	//this.add(this.curvaCentral)
 	
+}
+
+MontaniaRusa.prototype.setReflectionTextureName = function(name){
+	ReflectionManager.addReflectionToRenderable(this.curvas, name);
+}
+
+MontaniaRusa.prototype.setReflectiveness = function(ref){
+	this.curvas.setReflectiveness(ref);
 }
