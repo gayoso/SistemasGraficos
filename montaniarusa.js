@@ -117,7 +117,6 @@ var MontaniaRusa = function(){
 	this.tablas = new Conjunto();
 	this.columnas = new Conjunto();
 	this.carrito = new Carrito();
-	this.add(this.carrito);
 	var curva = new Curva(this.puntos);
 	var derivadas = curva.getDerivada();
 	var j = 1;
@@ -204,6 +203,7 @@ var MontaniaRusa = function(){
 	this.curvas = new Conjunto();
 	
 	mat4.translate(m3,m3,centro);
+	this.matTraslacion = mat4.clone(m3);
 	mat4.translate(m3,m3,vec3.fromValues(0,-0.5,0));
 	this.curvaCentral.setTransform(m3);
 	this.curvas.add(this.curvaCentral)
@@ -232,6 +232,7 @@ var MontaniaRusa = function(){
 	this.curva2.setTransform(m2);
 	this.curvas.add(this.curva2);
 	this.add(this.curvas);
+	this.ultimoAngulo = 0;
 }
 
 MontaniaRusa.prototype.getTablas = function(){
@@ -239,6 +240,9 @@ MontaniaRusa.prototype.getTablas = function(){
 }
 MontaniaRusa.prototype = Object.create(Conjunto.prototype);
 MontaniaRusa.prototype.constructor = MontaniaRusa;
+MontaniaRusa.prototype.getPosicionCarrito = function(){
+	return [this.ultimoPuntoCarrito, this.ultimaPendiente];
+}
 
 MontaniaRusa.prototype.avanzar = function(){
 	var mat = mat4.create();
@@ -246,23 +250,43 @@ MontaniaRusa.prototype.avanzar = function(){
 	t = this.timer.elapsed_seconds();
 	this.curvaCentral = new Mesh(new Curva(this.puntos));
 	var curva = new Curva(this.puntos);
+	var m3 = mat4.create();
 	var centro = this.curvaCentral.getCenter();
+
 	vec3.scale(centro, centro, -1);
+	mat4.translate(m3,m3,centro);
+	this.curvaCentral.setTransform(m3);
 	var desplazamiento = vec3.create();
 	vec3.add(desplazamiento, this.puntos[0], centro);
 	var pendiente = vec3.clone(curva.getPendiente(t));
-
+	this.ultimoPuntoCarrito = curva.getPunto(t);
+	vec3.transformMat4(this.ultimoPuntoCarrito, this.ultimoPuntoCarrito, this.matTraslacion);
+	this.ultimaPendiente = vec3.clone(pendiente);
 	mat4.translate(mat,mat,desplazamiento);
 	
 	mat4.translate(mat, mat, curva.getPunto(t));
 	var x = pendiente[0];
 	var y = pendiente[1];
 	var z = pendiente[2];
-	mat4.rotateY(mat, mat, Math.atan((x+0.001)/(z+0.001)));
+	mat4.rotateY(mat, mat, Math.PI/2);
+	var vecPendiente = vec2.fromValues(x, z);
+	var vecBase = vec2.fromValues(1, 0);
+	var dot = vec2.dot(vecPendiente, vecBase);
+	var angulo = Math.acos(dot/vec2.length(vecPendiente));
+	if(z < 0){
+		angulo = -angulo;
+	}
+	mat4.rotateY(mat, mat,  -angulo);
 	var binormal = vec3.create();
 	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
 	var adyacente = Math.pow(x*x+z*z,0.5);
-	mat4.rotate(mat, mat, Math.atan((y+0.001)/adyacente), binormal);
+	angulo = -Math.atan((y+0.001)/adyacente);
+	if (y > 0){
+		//angulo = -angulo;
+	} else {
+		angulo = -angulo;
+	}
+	mat4.rotate(mat, mat, angulo , binormal);
 
 	this.carrito.setTransform(mat);
 	this.add(this.carrito);

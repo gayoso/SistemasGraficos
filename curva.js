@@ -53,6 +53,8 @@ Curva.prototype.getPendiente = function(t){
 	vec3.scale(punto1, punto1, 1-decimales);
 	vec3.scale(punto2, punto2, decimales);
 	vec3.add(punto2, punto2, punto1);
+	var matriz = this.matrix_local;
+	//mat4.scale(matriz, matriz, 0.5);
 	return punto2;
 }
 
