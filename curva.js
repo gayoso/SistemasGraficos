@@ -12,6 +12,7 @@ var Curva = function(_puntos, _largo) {
 	this.rows = 0;
 	this.cols = 0;
 	this.radio = 0.2;
+	this.bezier_points = [];
 	this.derivadas = [];
 	Geometry.call(this, this.gridType);
 	this.init();
@@ -31,6 +32,28 @@ Curva.prototype.setRadio = function(unRadio){
 
 Curva.prototype.getDerivada = function(){
 	return this.derivadas;
+}
+
+Curva.prototype.getPunto = function(t){
+	t = 10*t;
+	var punto1 = vec3.clone(this.bezier_points[(Math.floor(t)%this.derivadas.length)]);
+	var punto2 = vec3.clone(this.bezier_points[(Math.ceil(t)%this.derivadas.length)]);
+	var decimales = t - Math.floor(t);
+	vec3.scale(punto1, punto1, 1-decimales);
+	vec3.scale(punto2, punto2, decimales);
+	vec3.add(punto2, punto2, punto1);
+	return punto2;
+}
+
+Curva.prototype.getPendiente = function(t){
+	t = 10*t;
+	var punto1 = vec3.clone(this.derivadas[(Math.floor(t)%this.derivadas.length)][1]);
+	var punto2 = vec3.clone(this.derivadas[(Math.ceil(t)%this.derivadas.length)][1]);
+	var decimales = t - Math.floor(t);
+	vec3.scale(punto1, punto1, 1-decimales);
+	vec3.scale(punto2, punto2, decimales);
+	vec3.add(punto2, punto2, punto1);
+	return punto2;
 }
 
 Curva.prototype.createCurveGrid = function(){
@@ -134,7 +157,7 @@ Curva.prototype.createCurveGrid = function(){
 			vec3.add(bezier_point, p0_escalado, p1_escalado);
 			vec3.add(bezier_point, bezier_point, p2_escalado);
 			vec3.add(bezier_point, bezier_point, p3_escalado);
-			
+			this.bezier_points.push(bezier_point);
 			this.putSlice(bezier_point, color);
 			this.rows++;
 

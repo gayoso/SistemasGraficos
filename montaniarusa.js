@@ -1,29 +1,32 @@
 
 
 var MontaniaRusa = function(){
+	this.timer = new Timer();
+	this.timer.start();
 	Conjunto.call(this);
 		/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
 	// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
 	
-	var puntos = [];
-	
-	puntos.push(vec3.fromValues(0, 0, 0));
-	puntos.push(vec3.fromValues(20, 0, 0));
-	puntos.push(vec3.fromValues(20, 0, 20));
-	puntos.push(vec3.fromValues(0, 10, 20));
-	puntos.push(vec3.fromValues(0, 20, 0));
-	puntos.push(vec3.fromValues(0, 30, -20));
-	puntos.push(vec3.fromValues(0, 30, -40));
-	puntos.push(vec3.fromValues(-15, 25, -45));
-	puntos.push(vec3.fromValues(-15, 20, -30));
-	puntos.push(vec3.fromValues(0, 20, -30));
-	puntos.push(vec3.fromValues(0, 15, -45));
-	puntos.push(vec3.fromValues(-20, 15, -45));
-	puntos.push(vec3.fromValues(-20, 10, -20));
 
-	puntos.push(vec3.fromValues(-20, 10, -10));
-	puntos.push(vec3.fromValues(-20, 0, 0));
-	puntos.push(vec3.fromValues(0, 0, 0));
+	this.puntos = [];
+	
+	this.puntos.push(vec3.fromValues(0, 0, 0));
+	this.puntos.push(vec3.fromValues(20, 0, 0));
+	this.puntos.push(vec3.fromValues(20, 0, 20));
+	this.puntos.push(vec3.fromValues(0, 10, 20));
+	this.puntos.push(vec3.fromValues(0, 20, 0));
+	this.puntos.push(vec3.fromValues(0, 30, -20));
+	this.puntos.push(vec3.fromValues(0, 30, -40));
+	this.puntos.push(vec3.fromValues(-15, 25, -45));
+	this.puntos.push(vec3.fromValues(-15, 20, -30));
+	this.puntos.push(vec3.fromValues(0, 20, -30));
+	this.puntos.push(vec3.fromValues(0, 15, -45));
+	this.puntos.push(vec3.fromValues(-20, 15, -45));
+	this.puntos.push(vec3.fromValues(-20, 10, -20));
+
+	this.puntos.push(vec3.fromValues(-20, 10, -10));
+	this.puntos.push(vec3.fromValues(-20, 0, 0));
+	this.puntos.push(vec3.fromValues(0, 0, 0));
  
 	/*
 	var puntos = [];
@@ -113,9 +116,9 @@ var MontaniaRusa = function(){
 	var puntosInterior = [];
 	this.tablas = new Conjunto();
 	this.columnas = new Conjunto();
-
-
-	var curva = new Curva(puntos);
+	this.carrito = new Mesh(new Cilindro());
+	this.add(this.carrito);
+	var curva = new Curva(this.puntos);
 	var derivadas = curva.getDerivada();
 	var j = 1;
 	var ultimoPunto = vec3.create();
@@ -191,7 +194,7 @@ var MontaniaRusa = function(){
 	}
 	this.add(this.tablas);
 	this.add(this.columnas);
-	this.curvaCentral = new Mesh(new Curva(puntos));
+	this.curvaCentral = new Mesh(new Curva(this.puntos));
 	var m3 = mat4.create();
 	var centro = this.curvaCentral.getCenter();
 	vec3.scale(centro, centro, -1);
@@ -234,3 +237,33 @@ MontaniaRusa.prototype.getTablas = function(){
 }
 MontaniaRusa.prototype = Object.create(Conjunto.prototype);
 MontaniaRusa.prototype.constructor = MontaniaRusa;
+
+MontaniaRusa.prototype.avanzar = function(){
+	var mat = mat4.create();
+
+	t = this.timer.elapsed_seconds();
+	this.curvaCentral = new Mesh(new Curva(this.puntos));
+	var curva = new Curva(this.puntos);
+	var centro = this.curvaCentral.getCenter();
+	vec3.scale(centro, centro, -1);
+	var desplazamiento = vec3.create();
+	vec3.add(desplazamiento, this.puntos[0], centro);
+	var pendiente = vec3.clone(curva.getPendiente(t));
+
+	mat4.translate(mat,mat,desplazamiento);
+	
+	mat4.translate(mat, mat, curva.getPunto(t));
+	var x = pendiente[0];
+	var y = pendiente[1];
+	var z = pendiente[2];
+	mat4.rotateY(mat, mat, Math.atan((x+0.001)/(z+0.001)));
+	var binormal = vec3.create();
+	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
+	var adyacente = Math.pow(x*x+z*z,0.5);
+	mat4.rotate(mat, mat, Math.atan((y+0.001)/adyacente), binormal);
+
+	this.carrito.setTransform(mat);
+	this.add(this.carrito);
+	//this.add(this.curvaCentral)
+	
+}
