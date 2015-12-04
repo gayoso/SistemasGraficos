@@ -401,22 +401,21 @@
 			
 			updateView();
 		}
-
+		
 		function handleMouseWheel(event){
 			var delta;
-			if (event.wheelData){
-				delta = event.wheelData
+
+			if (event.wheelDelta){
+				delta = event.wheelDelta/-120;
 			} else if (event.detail){
 				delta = event.detail;
 			}
-
 			var deltaP = vec3.create();
 
 			vec3.subtract(deltaP, puntoOjo, puntoMirado);
 
 			vec3.scale(deltaP, deltaP, delta/10+1);
 			vec3.add(puntoOjo, puntoMirado, deltaP);
-			
 			updateView();
 		}
 
@@ -552,13 +551,30 @@
 				}*/
 				canvas.onmousedown = handleMouseDown;
 				document.onmouseup = handleMouseUp;
-				document.onmousemove = handleMouseMove; 
-				document.onkeydown = handleKeyDown;
-				document.onkeyup = handleKeyUp;  
-				window.addEventListener('DOMMouseScroll', handleMouseWheel);
 
+				document.onmousemove = handleMouseMove; 
+
+				document.onkeydown = handleKeyDown;				
+				//document.onkeyup = handleKeyUp;  
+
+				///window.addEventListener('DOMMouseScroll', handleMouseWheel);
+				canvas.addEventListener("mousewheel", handleMouseWheel, false);
+				if (canvas.addEventListener) {    // all browsers except IE before version 9
+                    // Internet Explorer, Opera, Google Chrome and Safari
+                canvas.addEventListener ("mousewheel", handleMouseWheel, false);
+                    // Firefox
+                canvas.addEventListener ("DOMMouseScroll", handleMouseWheel, false);
+
+            }
+            else {
+            	window.alert("IE viejo?");
+                if (canvas.attachEvent) { // IE before version 9
+                    canvas.attachEvent ("onmousewheel", handleMouseWheel);
+                }
+            }
 
 			}catch(e){
+				window.alert("Maal");
 			}
 							
 			if(gl)
