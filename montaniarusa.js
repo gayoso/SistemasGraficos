@@ -275,7 +275,7 @@ MontaniaRusa.prototype.avanzar = function(){
 	var angulo = Math.acos(dot/vec2.length(vecPendiente));
 	var binormal = vec3.create();
 	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
-	vec3.scale(binormal, binormal, 0.1);
+	vec3.scale(binormal, binormal, 0.2);
 	if(z < 0){
 		angulo = -angulo;
 	}
