@@ -273,12 +273,14 @@ MontaniaRusa.prototype.avanzar = function(){
 	var vecBase = vec2.fromValues(1, 0);
 	var dot = vec2.dot(vecPendiente, vecBase);
 	var angulo = Math.acos(dot/vec2.length(vecPendiente));
+	var binormal = vec3.create();
+	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
+	vec3.scale(binormal, binormal, 0.1);
 	if(z < 0){
 		angulo = -angulo;
 	}
 	mat4.rotateY(mat, mat,  -angulo);
-	var binormal = vec3.create();
-	vec3.cross(binormal, pendiente,vec3.fromValues(0,1,0));
+
 	var adyacente = Math.pow(x*x+z*z,0.5);
 	angulo = -Math.atan((y+0.001)/adyacente);
 	if (y > 0){
@@ -287,13 +289,18 @@ MontaniaRusa.prototype.avanzar = function(){
 		angulo = -angulo;
 	}
 	mat4.rotate(mat, mat, angulo , binormal);
-
 	this.carrito.setTransform(mat);
+	mat = mat4.create();
+
+	mat4.translate(mat, mat, binormal);
+	this.carrito.applyMatrix(mat);
+	mat = mat4.create();
+	mat4.translate(mat, mat, vec3.fromValues(0,2,0));
+	this.carrito.applyMatrix(mat);
 	this.add(this.carrito);
 	//this.add(this.curvaCentral)
-	
-}
 
+}
 MontaniaRusa.prototype.setReflectionTextureName = function(name){
 	ReflectionManager.addReflectionToRenderable(this.curvas, name);
 }
