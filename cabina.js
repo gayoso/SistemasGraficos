@@ -3,7 +3,6 @@ var Cabina = function(color){
 	Conjunto.call(this);
 	
 	var cab = Cabina.cabina();
-	//cab.setShininess(10.0);
 	cab.setKs(1);
 	this.add( cab );
 	if(color !== undefined){

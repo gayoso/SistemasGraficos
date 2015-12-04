@@ -116,7 +116,7 @@ var MontaniaRusa = function(){
 	var puntosInterior = [];
 	this.tablas = new Conjunto();
 	this.columnas = new Conjunto();
-	this.carrito = new Mesh(new Cilindro());
+	this.carrito = new Carrito();
 	this.add(this.carrito);
 	var curva = new Curva(this.puntos);
 	var derivadas = curva.getDerivada();
