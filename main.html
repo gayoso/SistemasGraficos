@@ -778,11 +778,11 @@
 			vuelta_al_mundo.setTransform(m1);
 			vuelta_al_mundo.setReflectionTextureName("background_day");
 			vuelta_al_mundo.setReflectiveness(0.7);
-			//escena.addConjunto(vuelta_al_mundo);
+			escena.addConjunto(vuelta_al_mundo);
 			
 			/*** CARRITO	 ***/
-			carrito = new Carrito();
-			escena.addConjunto(carrito);			
+			//carrito = new Carrito();
+			//escena.addConjunto(carrito);			
 			
 			/*** MONTAÑA RUSA ***/
 			montania_rusa = new MontaniaRusa();
@@ -800,7 +800,7 @@
 			mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 			sillas_giratorias.setTransform(m2);
-			//escena.addConjunto(sillas_giratorias);			
+			escena.addConjunto(sillas_giratorias);			
 			
 			/*** MATRIZ DE PERSPECTIVA (ES SIEMPRE LA MISMA) ***/
 			var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
