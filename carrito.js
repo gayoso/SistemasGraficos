@@ -11,6 +11,10 @@ var Carrito = function(color){
 	this.cuerpo.setKs(1);
 	this.add( this.todo );
 	
+	this.todo.setKd(0.4);
+	this.todo.setKs(1.0);
+	this.todo.setShininess(32.0);
+	
 	/*var mat_c = mat4.create();
 	var c = this.getCenter();
 	vec3.scale(c, c, -1);

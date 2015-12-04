@@ -364,7 +364,7 @@ TexturedMesh.prototype.render = function(m){
 		gl.uniform1i(gl.getUniformLocation(glProgram, "uHeightSampler"), 1);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture_displacement);
 	}
-	
+	//Conjunto.prototype.render.call(this);
 	//this.geometry.drawVertexGrid(m_final);
 	Mesh.prototype.render.call(this, m);
 	gl.disableVertexAttribArray(textureCoordAttribute);
@@ -380,6 +380,4 @@ TexturedMesh.prototype.render = function(m){
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		gl.uniform1i(u_use_height, false);
 	}
-	
-	Conjunto.prototype.render.call(this);
 };
