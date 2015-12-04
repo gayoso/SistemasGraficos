@@ -1,14 +1,13 @@
 
-var Cuadrado = function(){
-	this.setRows();
-	this.setCols();
+var Cuadrado = function(w, h){
+	this.setRows(w);
+	this.setCols(h);
 	
 	/*this.tangent_buffer = [];
 	this.binormal_buffer = [];
 	
 	this.webgl_tangent_buffer = null;
 	this.webgl_binormal_buffer = null;*/
-	
 	Geometry.call(this, this.gridType);
 	this.tangent_buffer = [];
 	this.binormal_buffer = [];
@@ -22,12 +21,18 @@ Cuadrado.prototype.createGrid = function(){
 	this.createUniformPlaneGrid();
 }
 
-Cuadrado.prototype.setRows = function(){
-	this.rows = 2;
+Cuadrado.prototype.setRows = function(w){
+	if(w === undefined){
+		w = 2;
+	}
+	this.rows = w;
 }
 
-Cuadrado.prototype.setCols = function(){
-	this.cols = 2;
+Cuadrado.prototype.setCols = function(h){
+	if(h === undefined){
+		h = 2;
+	}
+	this.cols = h;
 }
 
 // crea los puntos de una malla plana con 'rows' filas y 'cols' columnas

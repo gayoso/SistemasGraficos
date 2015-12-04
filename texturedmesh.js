@@ -13,7 +13,7 @@ var TexturedMesh = function(path_to_texture, mapping_function, geometry, cant_ti
 	this.mapping_function = mapping_function;
 	this.texture = null;
 	this.texture_normals = null;
-	//this.texture_height = null;
+	this.texture_displacement = null;
 	
 	if(cant_tiles === undefined){
 		cant_tiles = 1;
@@ -93,6 +93,7 @@ TexturedMesh.mapper_sillas_columna = function(filas, cols, cant_tiles){
 
 TexturedMesh.mapper_piso = function(filas, cols, cant_tiles){
 	//var cant_tiles = 100;
+
 	var buffer = [];
 	
 	buffer.push(0);
@@ -107,6 +108,27 @@ TexturedMesh.mapper_piso = function(filas, cols, cant_tiles){
 	buffer.push(cant_tiles);
 	buffer.push(cant_tiles);
 	
+	return buffer;
+}
+
+TexturedMesh.mapper_piso_terrain = function(filas, cols, cant_tiles){
+	//var cant_tiles = 100;
+	var buffer = [];
+	for (var i = 0.0; i < filas; i++) {
+		for (var j = 0.0; j < cols; j++) {
+			buffer.push((cant_tiles/cols)*j);
+			buffer.push((cant_tiles/filas)*i);
+	
+			/*buffer.push(cant_tiles);
+			buffer.push(0);
+	
+			buffer.push(0);
+			buffer.push(cant_tiles);
+	
+			buffer.push(cant_tiles);
+			buffer.push(cant_tiles);*/
+		}
+	}
 	return buffer;
 }
 
@@ -220,6 +242,7 @@ TexturedMesh.prototype.loadTexture = function(path_to_texture){
 	this.texture.image.onload = function() {
 		TexturedMesh.handleLoadedTexture();
 	}
+	gl.bindTexture(gl.TEXTURE_2D, null); // esto no se si va
 	this.texture.image.src = path_to_texture;
 	gl.bindTexture(gl.TEXTURE_2D, null); // esto no se si va
 };
@@ -248,6 +271,32 @@ TexturedMesh.prototype.loadNormalTexture = function(path_to_normal_texture){
 	}
 	gl.bindTexture(gl.TEXTURE_2D, null); // esto no se si va
 	this.texture_normals.image.src = path_to_normal_texture;
+};
+
+TexturedMesh.prototype.loadDisplacementTexture = function(path_to_disp_texture){
+	var i = TexturedMesh.textures_loaded_names.indexOf(path_to_disp_texture);
+	if(i != -1){
+		this.texture_displacement = TexturedMesh.textures_loaded[i];
+		return;
+	}
+	i = TexturedMesh.textures_to_load_names.indexOf(path_to_disp_texture);
+	if(i != -1){
+		this.texture_displacement = TexturedMesh.textures_to_load[i];
+		return;
+	}
+	
+	this.texture_displacement = gl.createTexture();
+	this.texture_displacement.image = new Image();
+	TexturedMesh.textures_to_load.push(this.texture_displacement);
+	TexturedMesh.textures_to_load_names.push(path_to_disp_texture);
+	gl.bindTexture(gl.TEXTURE_2D, this.texture_displacement);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255]));
+	TexturedMesh.textures_to_load_repeat.push(this.cant_tiles);
+	this.texture_displacement.image.onload = function() {
+		TexturedMesh.handleLoadedTexture();
+	}
+	gl.bindTexture(gl.TEXTURE_2D, null); // esto no se si va
+	this.texture_displacement.image.src = path_to_disp_texture;
 };
 
 TexturedMesh.prototype.initBuffers = function(){
@@ -307,6 +356,15 @@ TexturedMesh.prototype.render = function(m){
 		gl.bindTexture(gl.TEXTURE_2D, this.texture_normals);
 	}
 	
+	var u_use_height = gl.getUniformLocation(glProgram, "uUseHeightMap");
+	if(this.texture_displacement != null){
+		gl.uniform1i(u_use_height, true);
+		
+		gl.activeTexture(gl.TEXTURE3);
+		gl.uniform1i(gl.getUniformLocation(glProgram, "uHeightSampler"), 1);
+		gl.bindTexture(gl.TEXTURE_2D, this.texture_displacement);
+	}
+	
 	//this.geometry.drawVertexGrid(m_final);
 	Mesh.prototype.render.call(this, m);
 	gl.disableVertexAttribArray(textureCoordAttribute);
@@ -316,6 +374,11 @@ TexturedMesh.prototype.render = function(m){
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		gl.uniform1i(u_use_normals, false);
+	}
+	if(this.texture_displacement != null){
+		gl.activeTexture(gl.TEXTURE3);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.uniform1i(u_use_height, false);
 	}
 	
 	Conjunto.prototype.render.call(this);

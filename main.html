@@ -38,6 +38,7 @@
 	<script type="text/javascript" src="light_point.js"></script>
 	<script type="text/javascript" src="light_directional.js"></script>
 	<script type="text/javascript" src="agua.js"></script>
+	<script type="text/javascript" src="pasto.js"></script>
 	<!--
 	Vertex shader con iluminacion
 
@@ -58,6 +59,11 @@
 		uniform mat4 uVMatrix;
 		uniform mat4 uPMatrix;
 		uniform mat4 uNMatrix;
+		
+		uniform bool uUseHeightMap;
+		uniform sampler2D uHeightSampler;
+		uniform float uTime;
+		uniform bool uUseGrassEffect;
 
 		// Los varying son propiedades que toman valor para cada fragmento a partir
 		// de interpolar linealmente entre los valores que se les asigna en cada 
@@ -69,11 +75,35 @@
 		varying vec3 vertPos;
 		varying vec2 vTextureCoord;
 		
+		// funcion pseudo random robada de internet, no se que tan bien funca
+		float rand(vec2 co){
+			return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+		}
+		
 		void main(void) {
-			// gl_Position es una variable "built-in" de GLSL que es usada para 
-			// almacenar la posición resultante del fragmento.
-			gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
-			vertPos = vec3(uMMatrix * vec4(aVertexPosition, 1.0));
+			
+			vec2 texCoord = aTextureCoord;
+			vec2 secTexCoord = aTextureCoord;
+			float mix_factor = 1.0;
+			
+			if(uUseGrassEffect){
+				mix_factor = 0.5;
+				secTexCoord = vec2(secTexCoord.t, -secTexCoord.s) * 2.0;
+				texCoord.t += rand(texCoord) * uTime/300000.0;
+				secTexCoord.t += rand(secTexCoord) * uTime/300000.0;
+			}
+			
+			vec3 height = vec3(0, 0, 0);
+			if(uUseHeightMap){				
+				height = texture2D(uHeightSampler, texCoord).xyz;
+				height = mix(height, texture2D(uHeightSampler, secTexCoord).xyz, 0.5);
+				//height += rand(vec2(0, 0)) * 5.0 / 10.0;
+				height = vec3(height.x, height.y, height.z - 0.8);
+			}
+			
+			vec3 pos_final = aVertexPosition + vec3(0.0, 0.0, height.z * 10.0);
+			gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(pos_final, 1.0);
+			vertPos = vec3(uMMatrix * vec4(pos_final, 1.0));
 			vColor = aVertexColor;
 			vNormal = normalize(vec3(uNMatrix * vec4(normalize(aVertexNormal), 0.0)));
 			vBinormal = normalize(vec3(uNMatrix * vec4(normalize(aVertexBinormal), 0.0)));
@@ -609,7 +639,8 @@
 		}
 		
 		function setupBuffers()
-		{	
+		{			
+			/*** INICIALIZO TEXTURAS DE REFLECCION DE DIA Y DE NOCHE ***/
 			var dayBox = [
 				["xpos.png", gl.TEXTURE_CUBE_MAP_POSITIVE_X],
 				["xneg.png", gl.TEXTURE_CUBE_MAP_NEGATIVE_X],
@@ -630,94 +661,17 @@
 			];
 			ReflectionManager.addReflectionCubeMap(nightBox, "background_night");
 			
-			/*** DESCOMENTAR ESTO PARA QUE SE CREEN Y ORIENTEN (mas o menos lindo) ESTOS MODELOS ***/
-			/*** ESTO YA ESTA TERIMINADO, LO DEJO ACA POR AHORA ***/
-			vuelta_al_mundo = new VueltaAlMundo();
-			var m1 = mat4.create();
-			mat4.translate(m1, m1, vec3.fromValues(-20, 17.1, -10));
-			mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
-			mat4.scale(m1, m1, vec3.fromValues(4, 4, 4));
-			vuelta_al_mundo.setTransform(m1);
-			vuelta_al_mundo.setReflectionTextureName("background_day");
-			vuelta_al_mundo.setReflectiveness(0.7);
-
-			montania_rusa = new MontaniaRusa();
-			
-			/*** ESTOS PUNTOS SE USAN EN LA CREACION DE LAS CURVAS ***/
-			// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
-			
-			/*var puntos = [];
-			puntos.push(vec3.fromValues(5, 2, 0));
-			puntos.push(vec3.fromValues(5, 2, 4));
-			puntos.push(vec3.fromValues(5, 3, 5.5));
-			puntos.push(vec3.fromValues(5, 4, 7));
-			// giros horizontales
-			puntos.push(vec3.fromValues(5, 6, 8));
-			puntos.push(vec3.fromValues(7, 6.5, 10));
-			puntos.push(vec3.fromValues(8, 6.25, 9.5));
-			puntos.push(vec3.fromValues(8.5, 6, 9));
-			puntos.push(vec3.fromValues(8, 6, 8.5));
-			puntos.push(vec3.fromValues(7.5, 6, 9));
-			puntos.push(vec3.fromValues(8, 5.75, 9.5));
-			puntos.push(vec3.fromValues(8.5, 5.5, 9));
-			puntos.push(vec3.fromValues(8, 5.25, 8.5));
-			puntos.push(vec3.fromValues(7.5, 5.25, 9));
-			puntos.push(vec3.fromValues(8, 5.25, 9.5));
-			puntos.push(vec3.fromValues(8.5, 5, 9));
-			// end
-			puntos.push(vec3.fromValues(8.5, 4.5, 8));
-			puntos.push(vec3.fromValues(8.75, 3, 5));
-			puntos.push(vec3.fromValues(9, 5, 3));
-			puntos.push(vec3.fromValues(8.8, 7, 4));
-			puntos.push(vec3.fromValues(8.6, 5, 5));
-			puntos.push(vec3.fromValues(8.5, 3, 4));
-			puntos.push(vec3.fromValues(8.3, 3, 2));
-			puntos.push(vec3.fromValues(8, 2.5, 0.5));
-			puntos.push(vec3.fromValues(5, 2, 0));*/
-			
-			
-			/*** DESCOMENTAR ESTO PARA CREAR UNA CURVA ***/
-			/*curva1 = new Mesh( new Curva(puntos) );
-			var m1 = mat4.create();
-			var centro = curva1.getCenter();
-			vec3.scale(centro, centro, -1);
-			mat4.translate(m1, m1, centro);
-			curva1.applyMatrix(m1);*/
-			
-			/*** DESCOMENTAR ESTO PARA CREAR EL MODELO DE TRACK ***/
-			// Track tiene un modelo de riel para la montaña rusa, pero no logre hacer que funcione bien
-			// la idea era definir en curva que arme la curva aproximando con rectas de largo predefinido
-			// asi le pasaba el largo del modelo este, y despues era cuestion de ponerlo en cada lugar y orientarlo
-			/*track = new Track();
-			
-			var p0 = vec3.fromValues(0, 0, 0);
-			var p1 = vec3.fromValues(4, 0, 0);
-			// esta funcion deberia trasladar el riel al punto p0, y orientarlo segun el vector p0p1
-			// crei que estaba bien hecho, pero cuando lo pruebo en curva2 queda horrible y no alineado
-			track.fitToSegment(p0, p1);*/
-			
-			/*** DESCOMENTAR PARA CREAR CURVA CON TRACKS (anda para el orto y puede que se laguee banda) ***/
-			//curva2 = new CurvedGeometry(puntos, new Track());
-			puntoOjo = vec3.fromValues(0,0,-80);
-			puntoMirado = vec3.fromValues(0,0,0);
-			//vecArriba = vec3.fromValues(-0.38,0.92,0);
-			vecArriba = vec3.fromValues(0,1,0);
-			
 			/*** CREO LA ESCENA ***/
 			escena = new Scene();
-			//escena.addConjunto(vuelta_al_mundo);
-			var m4 = mat4.create();
-			mat4.translate(m4, m4, vec3.fromValues(0, 2, 0));
-			montania_rusa.applyMatrix(m4);
-			escena.addConjunto(montania_rusa);
-			//escena.addConjunto(vuelta_al_mundo);
-
+			
+			/*** LUZ DIRECCIONAL (DE DIA) Y LUCES PUNTUALES (DE NOCHE) ***/
 			// esta es una luz blanca de arriba (de infinito)
 			light_dia = new DirectionalLight(vec3.fromValues(0.0, 1, 0.0), 
 										vec3.fromValues(0.5, 0.5, 0.5), 
 										vec3.fromValues(1.5, 1.5, 1.5));
 			escena.addLight(light_dia);
 			
+			// luces puntuales
 			var ip_night = 0.25;
 			var ia_night = 0.05;
 			light_noche1 = new PointLight(vec3.fromValues(-20.0, -10.0, 5.0), 
@@ -756,28 +710,28 @@
 			escena.addLight(light_noche6);
 			light_noche6.turnOff();
 			
-			/*** ESTO DEFINE LA GEOMETRIA DEL PISO, SU TEXTURA Y COMO MAPEARLA ***/	
+			/*** AGUA ***/
 			agua = new Agua();
 			var m_agua = mat4.create();
-			mat4.translate(m_agua, m_agua, vec3.fromValues(0, -15.1, 0));
+			mat4.translate(m_agua, m_agua, vec3.fromValues(0, -16.5, 0));
 			mat4.rotate(m_agua, m_agua, -Math.PI/2, vec3.fromValues(1, 0, 0));
 			mat4.scale(m_agua, m_agua, vec3.fromValues(1000, 1000, 1000));
 			agua.applyMatrix(m_agua);
 			escena.addConjunto(agua);
 			agua.setReflectiveness(0.4);
+			// INICIALIZO LA REFLEXION DEL AGUA CON LA TEXTURA DEL CIELO DE DIA
 			ReflectionManager.addReflectionToRenderable(agua, "background_day");
-			//ReflectionManager.addReflectionToRenderable(agua, "background_night");
 			
-			piso = new TexturedMesh( "grass_diffuse2.jpg", TexturedMesh.mapper_piso, new Cuadrado(), 15, true, 0.5, 1, 0.5);
-			piso.loadNormalTexture("grass_normal2.jpg");
+			/*** PASTO ***/
+			piso = new Pasto();
 			var m_piso = mat4.create();
 			mat4.translate(m_piso, m_piso, vec3.fromValues(0, -15, 0));
 			mat4.rotate(m_piso, m_piso, -Math.PI/2, vec3.fromValues(1, 0, 0));
-			mat4.scale(m_piso, m_piso, vec3.fromValues(100, 100, 100));
+			//mat4.scale(m_piso, m_piso, vec3.fromValues(100, 100, 100));
 			piso.applyMatrix(m_piso);
 			escena.addConjunto(piso);
 			
-			/*** ESTO DEFINE LA GEOMETRIA DEL CIELO, SU TEXTURA Y COMO MAPEARLA ***/
+			/*** CIELO DIA Y NOCHE ***/
 			cielo_dia = new TexturedMesh("sky.jpg", TexturedMesh.mapper_cielo, new Esfera(), false, false);
 			cielo_noche = new TexturedMesh("night6.jpg", TexturedMesh.mapper_cielo, new Esfera(), false, false);
 			var m_cielo = mat4.create();
@@ -788,18 +742,42 @@
 			cielo_noche.applyMatrix(m_cielo);
 			escena.addConjunto(cielo_dia);
 			
+			/*** VUELTA AL MUNDO ***/
+			vuelta_al_mundo = new VueltaAlMundo();
+			var m1 = mat4.create();
+			mat4.translate(m1, m1, vec3.fromValues(-20, 17.1, -10));
+			mat4.rotate(m1, m1, -Math.PI/3, vec3.fromValues(0, 1, 0));
+			mat4.scale(m1, m1, vec3.fromValues(4, 4, 4));
+			vuelta_al_mundo.setTransform(m1);
+			vuelta_al_mundo.setReflectionTextureName("background_day");
+			vuelta_al_mundo.setReflectiveness(0.7);
+			escena.addConjunto(vuelta_al_mundo);
+			
+			/*** MONTAÑA RUSA ***/
+			montania_rusa = new MontaniaRusa();
+			var m4 = mat4.create();
+			mat4.translate(m4, m4, vec3.fromValues(0, 2, 0));
+			montania_rusa.applyMatrix(m4);
+			//escena.addConjunto(montania_rusa);	
+			
+			/*** SILLAS GIRATORIAS ***/
 			sillas_giratorias = new SillasGiratorias();
 			var m2 = mat4.create();
 			mat4.translate(m2, m2, vec3.fromValues(5, -11.99, 10));
 			mat4.rotate(m2, m2, -Math.PI/3, vec3.fromValues(0, 1, 0));
 			mat4.scale(m2, m2, vec3.fromValues(2, 2, 2));
 			sillas_giratorias.setTransform(m2);
-			//escena.addConjunto(sillas_giratorias);
+			escena.addConjunto(sillas_giratorias);			
 			
-			// Preparamos una matriz de perspectiva.
+			/*** MATRIZ DE PERSPECTIVA (ES SIEMPRE LA MISMA) ***/
 			var u_proj_matrix = gl.getUniformLocation(glProgram, "uPMatrix");
 			mat4.perspective(pMatrix, 45, 640.0/480.0, 0.1, 100000.0);
 			gl.uniformMatrix4fv(u_proj_matrix, false, pMatrix);
+			
+			/*** ACTUALIZO LA CAMARA Y LA MATRIZ DE VISTA UNA PRIMERA VEZ ***/
+			puntoOjo = vec3.fromValues(0,0,-80);
+			puntoMirado = vec3.fromValues(0,0,0);
+			vecArriba = vec3.fromValues(0,1,0);
 			updateView();
 		}
 		
