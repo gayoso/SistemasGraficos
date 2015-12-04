@@ -804,6 +804,27 @@
 		
 		function drawScene()
 		{
+			if (camara == 0){
+				var posicion = montania_rusa.getPosicionCarrito();
+				puntoOjo = posicion[0];
+				var delta = vec3.create();
+				vec3.normalize(delta, posicion[1]);
+				vec3.add(puntoMirado, posicion[0], delta);
+				//vec3.scale(delta, 0.1);
+				//vec3.subtract(puntoMirado, puntoMirado, vec3.fromValues(0, 0.6, 0));
+				//vec3.scale(delta, delta, 20);
+				//vec3.subtract(puntoOjo, puntoOjo, delta);
+				vec3.add(puntoOjo, puntoOjo, vec3.fromValues(0,7,0));
+				vec3.add(puntoMirado, puntoMirado, vec3.fromValues(0,6.9,0));
+				//var esfera = new Mesh(new Esfera());
+				//var matriz = mat4.create();
+				//mat4.translate(matriz, matriz, puntoOjo);
+				//esfera.setTransform(matriz);
+				//escena.addConjunto(esfera);
+
+				updateView();
+//				puntoMirado = posicion[1];
+			}
 			requestAnimationFrame(drawScene);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			

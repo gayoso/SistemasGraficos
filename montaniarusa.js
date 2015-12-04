@@ -199,6 +199,7 @@ var MontaniaRusa = function(){
 	vec3.scale(centro, centro, -1);
 
 	mat4.translate(m3,m3,centro);
+	this.matTraslacion = mat4.clone(m3);
 	mat4.translate(m3,m3,vec3.fromValues(0,-0.5,0));
 	this.curvaCentral.setTransform(m3);
 	this.add(this.curvaCentral)
@@ -236,6 +237,9 @@ MontaniaRusa.prototype.getTablas = function(){
 }
 MontaniaRusa.prototype = Object.create(Conjunto.prototype);
 MontaniaRusa.prototype.constructor = MontaniaRusa;
+MontaniaRusa.prototype.getPosicionCarrito = function(){
+	return [this.ultimoPuntoCarrito, this.ultimaPendiente];
+}
 
 MontaniaRusa.prototype.avanzar = function(){
 	var mat = mat4.create();
@@ -243,12 +247,18 @@ MontaniaRusa.prototype.avanzar = function(){
 	t = this.timer.elapsed_seconds();
 	this.curvaCentral = new Mesh(new Curva(this.puntos));
 	var curva = new Curva(this.puntos);
+	var m3 = mat4.create();
 	var centro = this.curvaCentral.getCenter();
+
 	vec3.scale(centro, centro, -1);
+	mat4.translate(m3,m3,centro);
+	this.curvaCentral.setTransform(m3);
 	var desplazamiento = vec3.create();
 	vec3.add(desplazamiento, this.puntos[0], centro);
 	var pendiente = vec3.clone(curva.getPendiente(t));
-
+	this.ultimoPuntoCarrito = curva.getPunto(t);
+	vec3.transformMat4(this.ultimoPuntoCarrito, this.ultimoPuntoCarrito, this.matTraslacion);
+	this.ultimaPendiente = vec3.clone(pendiente);
 	mat4.translate(mat,mat,desplazamiento);
 	
 	mat4.translate(mat, mat, curva.getPunto(t));
