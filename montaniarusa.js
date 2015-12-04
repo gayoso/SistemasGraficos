@@ -6,40 +6,118 @@ var MontaniaRusa = function(){
 	// es un posible recorrido de la montaña rusa, puede ser otro da lo mismo
 	
 	var puntos = [];
+	
 	puntos.push(vec3.fromValues(0, 0, 0));
 	puntos.push(vec3.fromValues(20, 0, 0));
 	puntos.push(vec3.fromValues(20, 0, 20));
 	puntos.push(vec3.fromValues(0, 10, 20));
 	puntos.push(vec3.fromValues(0, 20, 0));
 	puntos.push(vec3.fromValues(0, 30, -20));
-	puntos.push(vec3.fromValues(-20, 20, -20));
+	puntos.push(vec3.fromValues(0, 30, -40));
+	puntos.push(vec3.fromValues(-15, 25, -45));
+	puntos.push(vec3.fromValues(-15, 20, -30));
+	puntos.push(vec3.fromValues(0, 20, -30));
+	puntos.push(vec3.fromValues(0, 15, -45));
+	puntos.push(vec3.fromValues(-20, 15, -45));
+	puntos.push(vec3.fromValues(-20, 10, -20));
+
 	puntos.push(vec3.fromValues(-20, 10, -10));
 	puntos.push(vec3.fromValues(-20, 0, 0));
 	puntos.push(vec3.fromValues(0, 0, 0));
+ 
+	/*
+	var puntos = [];
+	puntos.push(vec3.fromValues(20, 8, 0));
+	puntos.push(vec3.fromValues(20, 8, 16));
+	puntos.push(vec3.fromValues(20, 12, 22));
+	puntos.push(vec3.fromValues(20, 16, 28));
+	// giros horizontales
+	puntos.push(vec3.fromValues(20, 24, 32));
+	puntos.push(vec3.fromValues(28, 26, 40));
+	puntos.push(vec3.fromValues(32, 25, 38));
+	puntos.push(vec3.fromValues(34, 24, 36));
+	puntos.push(vec3.fromValues(32, 24, 34));
+	puntos.push(vec3.fromValues(30, 24, 36));
+	puntos.push(vec3.fromValues(32, 23, 38));
+	puntos.push(vec3.fromValues(34, 22, 36));
+	puntos.push(vec3.fromValues(32, 21, 34));
+	puntos.push(vec3.fromValues(30, 21, 36));
+	puntos.push(vec3.fromValues(32, 21, 38));
+	puntos.push(vec3.fromValues(34, 20, 36));
+	// end
+	puntos.push(vec3.fromValues(34, 18, 32));
+	puntos.push(vec3.fromValues(35, 12, 20));
+	puntos.push(vec3.fromValues(36, 20, 12));
+	puntos.push(vec3.fromValues(8.8*4, 28, 16));
+	puntos.push(vec3.fromValues(8.6*4, 20, 20));
+	puntos.push(vec3.fromValues(34, 12, 16));
+	puntos.push(vec3.fromValues(8.3*4, 12, 8));
+	puntos.push(vec3.fromValues(32, 10, 8));
+	puntos.push(vec3.fromValues(20, 8, 0));*/
 
 
 	var puntosArray = [];
+	
 	puntosArray.push([0, 0, 0]);
 	puntosArray.push([20, 0, 0]);
 	puntosArray.push([20, 0, 20]);
 	puntosArray.push([0, 10, 20]);
 	puntosArray.push([0, 20, 0]);
-	puntosArray.push([0, 30, -20]);
-	puntosArray.push([-20, 20, -20]);
+	puntosArray.push([0, 30, -20]);	
+	puntosArray.push([0, 30, -40]);
+	puntosArray.push([-15, 25, -45]);
+	puntosArray.push([-15, 20, -30]);
+	puntosArray.push([0, 20, -30]);
+	puntosArray.push([0, 15, -45]);
+	puntosArray.push([-20, 15, -45]);
+	puntosArray.push([-20, 10, -20]);
 	puntosArray.push([-20, 10, -10]);
 	puntosArray.push([-20, 0, 0]);
 	puntosArray.push([0, 0, 0]);
+/*
+	puntosArray.push([20, 8, 0]);
+	puntosArray.push([20, 8, 16]);
+	puntosArray.push([20, 12, 22]);
+	puntosArray.push([20, 16, 28]);
+	// giros horizontales
+	puntosArray.push([20, 24, 32]);
+	puntosArray.push([28, 26, 40]);
+	puntosArray.push([32, 25, 38]);
+	puntosArray.push([34, 24, 36]);
+	puntosArray.push([32, 24, 34]);
+	puntosArray.push([30, 24, 36]);
+	puntosArray.push([32, 23, 38]);
+	puntosArray.push([34, 22, 36]);
+	puntosArray.push([32, 21, 34]);
+	puntosArray.push([30, 21, 36]);
+	puntosArray.push([32, 21, 38]);
+	puntosArray.push([34, 20, 36]);
+	// end
+	puntosArray.push([34, 18, 32]);
+	puntosArray.push([35, 12, 20]);
+	puntosArray.push([36, 20, 12]);
+	puntosArray.push([8.8*4, 28, 16]);
+	puntosArray.push([8.6*4, 20, 20]);
+	puntosArray.push([34, 12, 16]);
+	puntosArray.push([8.3*4, 12, 8]);
+	puntosArray.push([32, 10, 8]);
+	puntosArray.push([20, 8, 0]);*/
+
+
+
+
 
 
 	var puntosCentral = [];
 	var puntosExterior = [];
 	var puntosInterior = [];
-
+	this.tablas = new Conjunto();
+	this.columnas = new Conjunto();
 
 
 	var curva = new Curva(puntos);
 	var derivadas = curva.getDerivada();
-	var j = 0;
+	var j = 1;
 	var ultimoPunto = vec3.create();
 	for (var i = 0; i < derivadas.length; i++){
 		var puntoDerivado = derivadas[i];
@@ -73,7 +151,7 @@ var MontaniaRusa = function(){
 		mat4.translate(matriz, matriz, c);
 		flechaDerivada.setTransform(matriz);
 		if(j == 0){
-			this.add(flechaDerivada);
+			this.tablas.add(flechaDerivada);
 		}
 		var baseMasDerivada = vec3.create();
 		vec3.normalize(derivada, derivada);
@@ -89,14 +167,30 @@ var MontaniaRusa = function(){
 		mat4.translate(matriz, matriz, c);
 		flechaDerivada.setTransform(matriz);
 		j = (j+1) % 2;
-		if(vec3.distance(ultimoPunto, puntoBase) < 0.00005){
+		if(vec3.distance(ultimoPunto, puntoBase) < 0.2){
 			j = (j+1)%2;
+		}
+		if((i+1)%10 == 0){
+			var puntoPiso = vec3.clone(puntoBase);
+			puntoPiso[1] = -50;
+			var puntoMedio = vec3.create();
+			vec3.add(puntoMedio, puntoBase, puntoPiso);
+			vec3.scale(puntoMedio, puntoMedio, 0.5);
+			var puntosColumna = [puntoPiso, puntoMedio, puntoBase];
+			var curvaColumna = new Curva(puntosColumna);
+			curvaColumna.setRadio(0.3);
+			var columna = new Mesh(curvaColumna);
+			columna.setTransform(matriz);
+			this.columnas.add(columna);
+
 		}
 		//this.add(flechaDerivada);
 		ultimoPunto = vec3.clone(puntoBase);
 		
 		
 	}
+	this.add(this.tablas);
+	this.add(this.columnas);
 	this.curvaCentral = new Mesh(new Curva(puntos));
 	var m3 = mat4.create();
 	var centro = this.curvaCentral.getCenter();
@@ -108,7 +202,10 @@ var MontaniaRusa = function(){
 	this.add(this.curvaCentral)
 	
 	puntosInterior[puntosInterior.length - 1] = puntosInterior[0];
-	this.curva1 = new Mesh( new Curva(puntosInterior) );
+	var rielInterior = new Curva(puntosInterior);
+	rielInterior.setRadio(0.4);
+	this.curva1 = new Mesh( rielInterior );
+	
 	var m1 = mat4.create();
 	//var centro = this.curva1.getCenter();
 	//vec3.scale(centro, centro, -1);
@@ -117,7 +214,9 @@ var MontaniaRusa = function(){
 	this.add(this.curva1); 
 
 	puntosExterior[puntosExterior.length - 1] = puntosExterior[0];
-	this.curva2 = new Mesh(new Curva(puntosExterior));
+	var rielExterior = new Curva(puntosExterior);
+	rielExterior.setRadio(0.4);
+	this.curva2 = new Mesh(rielExterior);
 	var m2 = mat4.create();
 	//var centro = this.curva2.getCenter();
 	//vec3.scale(centro, centro, -1);
@@ -130,5 +229,8 @@ var MontaniaRusa = function(){
 	
 }
 
+MontaniaRusa.prototype.getTablas = function(){
+	return this.tablas;
+}
 MontaniaRusa.prototype = Object.create(Conjunto.prototype);
 MontaniaRusa.prototype.constructor = MontaniaRusa;

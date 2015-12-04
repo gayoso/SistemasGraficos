@@ -11,7 +11,7 @@ var Curva = function(_puntos, _largo) {
 	this.paso = _largo;
 	this.rows = 0;
 	this.cols = 0;
-	
+	this.radio = 0.2;
 	this.derivadas = [];
 	Geometry.call(this, this.gridType);
 	this.init();
@@ -22,6 +22,11 @@ Curva.prototype.constructor = Curva;
 
 Curva.prototype.createGrid = function(){
 	this.createCurveGrid();
+}
+
+Curva.prototype.setRadio = function(unRadio){
+	this.radio = unRadio;
+	this.init();
 }
 
 Curva.prototype.getDerivada = function(){
@@ -206,8 +211,8 @@ Curva.prototype.putSliceCircular = function(bezier_point, color){
 	this.cols = 50;
 	for(var j = 0; j < this.cols; j++){
 		var angulo = j * 2 * Math.PI / (this.cols-1);
-		this.position_buffer.push(bezier_point[0]+0.2*Math.cos(angulo));
-		this.position_buffer.push(bezier_point[1]+0.2*Math.sin(angulo));
+		this.position_buffer.push(bezier_point[0]+this.radio*Math.cos(angulo));
+		this.position_buffer.push(bezier_point[1]+this.radio*Math.sin(angulo));
 		this.position_buffer.push(bezier_point[2]);
 
 		this.color_buffer.push(color[0]);
