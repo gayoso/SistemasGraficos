@@ -375,16 +375,16 @@
 				var deltaP = vec3.create();
 			
 				vec3.subtract(deltaP, puntoMirado, puntoOjo);
-
 				var matR = mat4.create();
 				
 				mat4.identity(matR);
-				mat4.rotate(matR, matR, -deltaX/600, vecArriba);
+				mat4.rotate(matR, matR, -deltaX/150, vecArriba);
 				var ejeDeRotacion = vec3.create();
 				vec3.cross(ejeDeRotacion, vecArriba, deltaP);
-				mat4.rotate(matR, matR, deltaY/600, ejeDeRotacion);
+				mat4.rotate(matR, matR, deltaY/150, ejeDeRotacion);
 				vec3.transformMat4(deltaP, deltaP, matR);
 				vec3.transformMat4(vecArriba, vecArriba, matR);
+				vecArriba = vec3.fromValues(0,1,0);
 				vec3.add(puntoMirado, deltaP, puntoOjo);
 
 
@@ -484,6 +484,13 @@
 					vec3.subtract(puntoOjo, puntoOjo, deltaP);
 					vec3.subtract(puntoMirado, puntoMirado, deltaP);
 				}
+				if(String.fromCharCode(event.keyCode) == "Z"){
+					vec3.add(puntoOjo, puntoOjo, vec3.fromValues(0,1,0));
+				}
+				if(String.fromCharCode(event.keyCode) == "X"){
+					vec3.subtract(puntoOjo, puntoOjo, vec3.fromValues(0,1,0));
+				}
+
 			}
 			
 			updateView();
@@ -560,7 +567,8 @@
 
 				document.onmousemove = handleMouseMove; 
 
-				document.onkeydown = handleKeyDown;				
+				document.onkeydown = handleKeyDown;		
+
 				//document.onkeyup = handleKeyUp;  
 
 				///window.addEventListener('DOMMouseScroll', handleMouseWheel);
