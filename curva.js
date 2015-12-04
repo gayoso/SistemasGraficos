@@ -35,7 +35,7 @@ Curva.prototype.getDerivada = function(){
 }
 
 Curva.prototype.getPunto = function(t){
-	t = 10*t;
+	t = 15*t;
 	var punto1 = vec3.clone(this.bezier_points[(Math.floor(t)%this.derivadas.length)]);
 	var punto2 = vec3.clone(this.bezier_points[(Math.ceil(t)%this.derivadas.length)]);
 	var decimales = t - Math.floor(t);
@@ -46,7 +46,7 @@ Curva.prototype.getPunto = function(t){
 }
 
 Curva.prototype.getPendiente = function(t){
-	t = 10*t;
+	t = 15*t;
 	var punto1 = vec3.clone(this.derivadas[(Math.floor(t)%this.derivadas.length)][1]);
 	var punto2 = vec3.clone(this.derivadas[(Math.ceil(t)%this.derivadas.length)][1]);
 	var decimales = t - Math.floor(t);
