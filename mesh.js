@@ -102,29 +102,21 @@ Mesh.prototype.render = function(m){
 	if(m === undefined) m = mat4.create();
 	mat4.multiply(m_final, m, this.matrix_local);
 	
-	var u_color_specular = gl.getUniformLocation(glProgram, "uColorSpecular");
-	gl.uniform3fv(u_color_specular, this.color_specular);
+	gl.uniform3fv(glProgram.uColorSpecular, this.color_specular);
 	
-	var u_ka = gl.getUniformLocation(glProgram, "uKa");
-	gl.uniform1f(u_ka, this.ka);
+	gl.uniform1f(glProgram.uKa, this.ka);
 	
-	var u_kd = gl.getUniformLocation(glProgram, "uKd");
-	gl.uniform1f(u_kd, this.kd);
+	gl.uniform1f(glProgram.uKd, this.kd);
 	
-	var u_ks = gl.getUniformLocation(glProgram, "uKs");
-	gl.uniform1f(u_ks, this.ks);
+	gl.uniform1f(glProgram.uKs, this.ks);
 	
-	var u_shininess = gl.getUniformLocation(glProgram, "uShininess");
-	gl.uniform1f(u_shininess, this.shininess);
+	gl.uniform1f(glProgram.uShininess, this.shininess);
 	
-	var u_reflectiveness = gl.getUniformLocation(glProgram, "uReflectiveness");
-	gl.uniform1f(u_reflectiveness, this.reflectiveness);
+	gl.uniform1f(glProgram.uReflectiveness, this.reflectiveness);
 	
-	var u_use_lights = gl.getUniformLocation(glProgram, "uUseLights");
-	gl.uniform1i(u_use_lights, this.use_lights);
+	gl.uniform1i(glProgram.uUseLights, this.use_lights);
 	
-	var u_has_texture = gl.getUniformLocation(glProgram, "uHasTexture");
-	gl.uniform1i(u_has_texture, this.has_texture);
+	gl.uniform1i(glProgram.uHasTexture, this.has_texture);
 	
 	this.geometry.drawVertexGrid(m_final);
 	

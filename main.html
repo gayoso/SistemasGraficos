@@ -126,8 +126,8 @@
 			vec3 ambient;
 			vec3 intensity;
 		};
-		uniform PointLight pointLights[25];
-		uniform DirLight dirLights[25];
+		uniform PointLight pointLights[6];
+		uniform DirLight dirLights[1];
 		uniform float numLights;
 		
 		// material
@@ -212,7 +212,7 @@
 			vec3 color_final = vec3(0.0, 0.0, 0.0);
 			
 			// point lights
-			for(int i = 0; i < 25; ++i){
+			for(int i = 0; i < 6; ++i){
 			
 				// cosas que dependen de cada luz
 				vec3 Ia = pointLights[i].ambient; // luz ambiente (cada luz contribuye a esto)
@@ -238,12 +238,12 @@
 				}
 				
 				color_final += Ia * color * uKa + 
-									(Ip/* / numLights*/) * fatt * (color * uKd * lambertian + 
+									(Ip ) * fatt * (color * uKd * lambertian + 
 												uColorSpecular * uKs * specular);
 			}
 			
 			// dir lights
-			for(int i = 0; i < 25; ++i){
+			for(int i = 0; i < 1; ++i){
 			
 				// cosas que dependen de cada luz
 				vec3 Ia = dirLights[i].ambient; // luz ambiente (cada luz contribuye a esto)
@@ -268,7 +268,7 @@
 				}
 				
 				color_final += Ia * color * uKa + 
-									(Ip/* / numLights*/) * fatt * (color * uKd * lambertian + 
+									(Ip) * fatt * (color * uKd * lambertian + 
 												uColorSpecular * uKs * specular);
 			}
 			gl_FragColor = vec4(color_final, 1.0);
@@ -639,21 +639,79 @@
 			// Le decimos a WebGL que de aquí en adelante use el programa generado.
 			gl.useProgram(glProgram);
 			
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseWaterEffect"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uBlendTexture"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseNormalMap"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uHasTexture"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uUseLights"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uSampler"), 0);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uNormalSampler"), 1);
-			gl.uniform1i(gl.getUniformLocation(glProgram, "uCubeSampler"), 2);
+			glProgram.uMMatrix = gl.getUniformLocation(glProgram, "uMMatrix");
+			glProgram.uVMatrix = gl.getUniformLocation(glProgram, "uVMatrix");
+			glProgram.uPMatrix = gl.getUniformLocation(glProgram, "uPMatrix");
+			glProgram.uNMatrix = gl.getUniformLocation(glProgram, "uNMatrix");
+			glProgram.uTime = gl.getUniformLocation(glProgram, "uTime");
+			
+			// ESTO ESTA HARDCODEADO PARA MEJORAR PERFORMANCE
+			glProgram.dirLights = new Array;
+			for(var i = 0; i < 1; ++i){
+				var light = new Array;
+				light.push(gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "direction"));
+				light.push(gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient"));
+				light.push(gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity"));
+				glProgram.dirLights.push(light);
+			}
+			
+			glProgram.pointLights = new Array;
+			for(var i = 0; i < 6; ++i){
+				var light = new Array;
+				light.push(gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "position"));
+				light.push(gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient"));
+				light.push(gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity"));
+				glProgram.pointLights.push(light);
+			}
+			glProgram.numLights = gl.getUniformLocation(glProgram, "numLights");
+			
+			glProgram.uViewPos = gl.getUniformLocation(glProgram, "uViewPos");
+			glProgram.uColorSpecular = gl.getUniformLocation(glProgram, "uColorSpecular");
+			glProgram.uKa = gl.getUniformLocation(glProgram, "uKa");
+			glProgram.uKd = gl.getUniformLocation(glProgram, "uKd");
+			glProgram.uKs = gl.getUniformLocation(glProgram, "uKs");
+			glProgram.uShininess = gl.getUniformLocation(glProgram, "uShininess");
+			glProgram.uReflectiveness = gl.getUniformLocation(glProgram, "uReflectiveness");
+			
+			glProgram.uUseHeightMap = gl.getUniformLocation(glProgram, "uUseHeightMap");
+			gl.uniform1i(glProgram.uUseHeightMap, 0);
+			glProgram.uUseWaterEffect = gl.getUniformLocation(glProgram, "uUseWaterEffect");
+			gl.uniform1i(glProgram.uUseWaterEffect, 0);
+			glProgram.uUseGrassEffect = gl.getUniformLocation(glProgram, "uUseGrassEffect");
+			gl.uniform1i(glProgram.uUseGrassEffect, 0);
+			glProgram.uBlendTexture = gl.getUniformLocation(glProgram, "uBlendTexture");
+			gl.uniform1i(glProgram.uBlendTexture, 0);
+			glProgram.uUseNormalMap = gl.getUniformLocation(glProgram, "uUseNormalMap");
+			gl.uniform1i(glProgram.uUseNormalMap, 0);
+			glProgram.uUseReflection = gl.getUniformLocation(glProgram, "uUseReflection");
+			gl.uniform1i(glProgram.uUseReflection, 0);
+			glProgram.uHasTexture = gl.getUniformLocation(glProgram, "uHasTexture");
+			gl.uniform1i(glProgram.uHasTexture, 0);
+			glProgram.uUseLights = gl.getUniformLocation(glProgram, "uUseLights");
+			gl.uniform1i(glProgram.uUseLights, 0);
+			glProgram.uSampler = gl.getUniformLocation(glProgram, "uSampler");
+			gl.uniform1i(glProgram.uSampler, 0);
+			glProgram.uNormalSampler = gl.getUniformLocation(glProgram, "uNormalSampler");
+			gl.uniform1i(glProgram.uNormalSampler, 1);
+			glProgram.uCubeSampler = gl.getUniformLocation(glProgram, "uCubeSampler");
+			gl.uniform1i(glProgram.uCubeSampler, 2);
+			glProgram.uHeightSampler = gl.getUniformLocation(glProgram, "uHeightSampler");
+			gl.uniform1i(glProgram.uHeightSampler, 3);
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			gl.activeTexture(gl.TEXTURE1);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 			gl.activeTexture(gl.TEXTURE2);
 			gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+			gl.activeTexture(gl.TEXTURE3);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			
+			/*gl.aVertexPosition = gl.getAttribLocation(glProgram, "aVertexPosition");
+			gl.aVertexColor = gl.getAttribLocation(glProgram, "aVertexColor");
+			gl.aVertexNormal = gl.getAttribLocation(glProgram, "aVertexNormal");
+			gl.aTextureCoord = gl.getAttribLocation(glProgram, "aTextureCoord");
+			gl.aVertexTangent = gl.getAttribLocation(glProgram, "aVertexTangent");
+			gl.aVertexBinormal = gl.getAttribLocation(glProgram, "aVertexBinormal");*/
 		}
 		
 		function makeShader(src, type)
@@ -839,6 +897,7 @@
 				var binormal = vec3.create();
 				vec3.cross(binormal, vec3.fromValues(0,1,0), delta);
 				vec3.cross(vecArriba,  delta, binormal);
+				vecArriba = vec3.fromValues(0, 1, 0);
 				//var esfera = new Mesh(new Esfera());
 				//var matriz = mat4.create();
 				//mat4.translate(matriz, matriz, puntoOjo);

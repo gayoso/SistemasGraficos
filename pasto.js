@@ -9,19 +9,18 @@ var Pasto = function(){
 	this.pasto.loadNormalTexture("grass_normal2.jpg");
 	this.pasto.loadDisplacementTexture("grass_displacement.jpg");
 	this.add( this.pasto );
-	this.use_grass_effect = true;
+	this.use_grass_effect = false;
 }
 
 Pasto.prototype = Object.create(Conjunto.prototype);
 Pasto.prototype.constructor = Pasto;
 
 Pasto.prototype.render = function(m){
-	var u_user_grass = gl.getUniformLocation(glProgram, "uUseGrassEffect");
 	if(this.use_grass_effect == true){
-		gl.uniform1i(u_user_grass, true);
+		gl.uniform1i(glProgram.uUseGrassEffect, true);
 	}
 	Conjunto.prototype.render.call(this, m);
-	gl.uniform1i(u_user_grass, false);
+	gl.uniform1i(glProgram.uUseGrassEffect, false);
 }
 
 Pasto.prototype.toggleGrassEffect = function(){

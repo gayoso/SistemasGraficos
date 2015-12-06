@@ -21,12 +21,11 @@ Cabina.prototype.constructor = Cabina;
 
 Cabina.prototype.render = function(m){
 	
-	var u_blend_texture = gl.getUniformLocation(glProgram, "uBlendTexture");
-	gl.uniform1i(u_blend_texture, 1);
+	gl.uniform1i(glProgram.uBlendTexture, 1);
 	
 	Conjunto.prototype.render.call(this, m);
 	
-	gl.uniform1i(u_blend_texture, 0);
+	gl.uniform1i(glProgram.uBlendTexture, 0);
 }
 
 // POR SI ALGO NO ANDA, ACA ESTA HARDCODEADO QUE EL CENTRO DE LA CABINA ES EL PUNTO '3' DEL TRIANGULO '1' DEL TECHO (es el punto mas alto del techo)

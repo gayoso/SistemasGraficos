@@ -5,8 +5,11 @@ Tiene intensidades (especular, difusa) y contribucion a ambiente
 Guarda tambien la direccion de la luz en coordenadas de mundo
 ****************************************/
 
+var dir_index = 0;
+
 var DirectionalLight = function(dir, iip, iia) {
-	
+	this.index = point_index;
+	dir_index += 1;
 	this.dir = vec3.create();
 	this.ip = vec3.create();
 	this.ia = vec3.create();
@@ -35,30 +38,32 @@ DirectionalLight.prototype = {
 	constructor: DirectionalLight
 }
 
-DirectionalLight.prototype.render = function(i){
+DirectionalLight.prototype.render = function(){
+	var i = this.index;
 	if(!this.on){
-		this.resetUniforms(i);
+		this.resetUniforms();
 		return;
 	}
 	
-	var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "direction");
-	gl.uniform3fv(u_location, this.dir);
+	//var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "direction");
+	gl.uniform3fv(glProgram.dirLights[i][0], this.dir);
 	
-	u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient");
-	gl.uniform3fv(u_location, this.ia);
+	//u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient");
+	gl.uniform3fv(glProgram.dirLights[i][1], this.ia);
 	
-	u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity");
-	gl.uniform3fv(u_location, this.ip);
+	//u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity");
+	gl.uniform3fv(glProgram.dirLights[i][2], this.ip);
 	
 	//this.lamparita.render();
 }
 
-DirectionalLight.prototype.resetUniforms = function(i){
-	var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient");
-	gl.uniform3fv(u_location, [0, 0, 0]);
+DirectionalLight.prototype.resetUniforms = function(){
+	//var u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "ambient");
+	var i = this.index;
+	gl.uniform3fv(glProgram.dirLights[i][1], [0, 0, 0]);
 	
-	u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity");
-	gl.uniform3fv(u_location, [0, 0, 0]);
+	//u_location = gl.getUniformLocation(glProgram, "dirLights[" + i + "]." + "intensity");
+	gl.uniform3fv(glProgram.dirLights[i][2], [0, 0, 0]);
 }
 
 DirectionalLight.prototype.turnOn = function(){

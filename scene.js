@@ -36,7 +36,7 @@ Scene.prototype = {
 	removeLight: function(light){
 		var index = this.lights.indexOf(light);
 		if(index > -1){
-			this.lights[index].resetUniforms(index);
+			this.lights[index].resetUniforms();
 			this.lights.splice(index, 1);
 		}
 	},
@@ -60,31 +60,20 @@ Scene.prototype = {
 	},
 	
 	render: function(){
-		
-		/*gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), true);
-		
-		gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, ReflectionManager.getReflectionCubeMap("background"));*/
-        gl.uniform1i(gl.getUniformLocation(glProgram, "uCubeSampler"), 2);
+	
 		
 		/********* */
 	
-		var u_num_lights = gl.getUniformLocation(glProgram, "numLights");
-		gl.uniform1f(u_num_lights, this.lights.length);
+		gl.uniform1f(glProgram.numLights, this.lights.length);
 		
-		var u_time = gl.getUniformLocation(glProgram, "uTime");
-		gl.uniform1f(u_time, this.timer.elapsed_miliseconds());
+		gl.uniform1f(glProgram.uTime, this.timer.elapsed_miliseconds());
 		
 		for(var i = 0, l = this.lights.length; i < l; ++i){
-			this.lights[i].render(i);
+			this.lights[i].render();
 		}
 		
 		for(var i = 0, l = this.conjuntos.length; i < l; ++i){
 			this.conjuntos[i].render();
 		}
-		
-		/*gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), false);*/
 	}
 }

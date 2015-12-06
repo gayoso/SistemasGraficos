@@ -10,7 +10,7 @@ var Geometry = function() {
 	}
 	
 	// hay generacion de indices para TRINANGLE_STRIP y TRIANGLES
-	this.draw_mode = gl.TRIANGLES;
+	this.draw_mode = gl.TRIANGLE_STRIP;
 	
 	// buffers
 	this.position_buffer = [];
@@ -257,16 +257,14 @@ Geometry.prototype = {
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 		//gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.position_buffer), gl.STATIC_DRAW);
 		
-		var u_model_matrix = gl.getUniformLocation(glProgram, "uMMatrix");
 		var model_matrix_final = mat4.create();
 		mat4.multiply(model_matrix_final, m, this.model_matrix);
-		gl.uniformMatrix4fv(u_model_matrix, false, model_matrix_final);
+		gl.uniformMatrix4fv(glProgram.uMMatrix, false, model_matrix_final);
 		
-		var u_normals_matrix = gl.getUniformLocation(glProgram, "uNMatrix");
 		var normals_matrix = mat4.create();
 		mat4.invert(normals_matrix, model_matrix_final);
 		mat4.transpose(normals_matrix, normals_matrix);
-		gl.uniformMatrix4fv(u_normals_matrix, false, normals_matrix);
+		gl.uniformMatrix4fv(glProgram.uNMatrix, false, normals_matrix);
 
 		var vertexColorAttribute = gl.getAttribLocation(glProgram, "aVertexColor");
 		gl.enableVertexAttribArray(vertexColorAttribute);

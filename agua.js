@@ -16,8 +16,7 @@ Agua.prototype.constructor = Agua;
 
 Agua.prototype.render = function(m){
 	
-	var u_user_water = gl.getUniformLocation(glProgram, "uUseWaterEffect");
-	gl.uniform1i(u_user_water, 1);
+	gl.uniform1i(glProgram.uUseWaterEffect, 1);
 	Conjunto.prototype.render.call(this, m);
-	gl.uniform1i(u_user_water, 0);
+	gl.uniform1i(glProgram.uUseWaterEffect, 0);
 }

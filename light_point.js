@@ -6,8 +6,11 @@ Tiene intensidades (especular, difusa) y contribucion a ambiente
 Guarda tambien la posicion de la luz en coordenadas de mundo
 ****************************************/
 
+var point_index = 0;
+
 var PointLight = function(ppos, iip, iia) {
-	
+	this.index = point_index;
+	point_index += 1;
 	this.pos = vec3.create();
 	this.ip = vec3.create();
 	this.ia = vec3.create();
@@ -48,31 +51,34 @@ PointLight.prototype = {
 	constructor: PointLight
 }
 
-PointLight.prototype.render = function(i){
+PointLight.prototype.render = function(){
 	this.lamparita.render();
+	
+	var i = this.index;
 
 	if(!this.on){
-		this.resetUniforms(i);
+		this.resetUniforms();
 		return;
 	}
 	
-	var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "position");
-	gl.uniform3fv(u_location, this.pos);
+	//var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "position");
+	gl.uniform3fv(glProgram.pointLights[i][0], this.pos);
 	
-	u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient");
-	gl.uniform3fv(u_location, this.ia);
+	//u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient");
+	gl.uniform3fv(glProgram.pointLights[i][1], this.ia);
 	
-	u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
-	gl.uniform3fv(u_location, this.ip);	
+	//u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
+	gl.uniform3fv(glProgram.pointLights[i][2], this.ip);	
 }
 
-PointLight.prototype.resetUniforms = function(i){
+PointLight.prototype.resetUniforms = function(){
+	var i = this.index;
 	
-	var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient");
-	gl.uniform3fv(u_location, [0, 0, 0]);
+	//var u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "ambient");
+	gl.uniform3fv(glProgram.pointLights[i][1], [0, 0, 0]);
 	
-	u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
-	gl.uniform3fv(u_location, [0, 0, 0]);
+	//u_location = gl.getUniformLocation(glProgram, "pointLights[" + i + "]." + "intensity");
+	gl.uniform3fv(glProgram.pointLights[i][2], [0, 0, 0]);
 }
 
 PointLight.prototype.turnOn = function(){

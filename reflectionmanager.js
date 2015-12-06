@@ -68,16 +68,16 @@ ReflectionManager.addReflectionToRenderable = function(object, reflection_name){
 	}
 	
 	object["render"] = function() {
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), true);
+		gl.uniform1i(glProgram.uUseReflection, true);
 		
 		gl.activeTexture(gl.TEXTURE2);
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, ReflectionManager.getReflectionCubeMap(reflection_name));
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uCubeSampler"), 2);
+		gl.uniform1i(glProgram.uCubeSampler, 2);
 		
 		originalRender.apply(object, arguments);
 		
 		gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uUseReflection"), false);
+		gl.uniform1i(glProgram.uUseReflection, false);
 	};
 }

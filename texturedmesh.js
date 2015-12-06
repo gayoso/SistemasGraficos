@@ -313,30 +313,6 @@ TexturedMesh.prototype.initBuffers = function(){
 };
 
 TexturedMesh.prototype.render = function(m){
-	/*var m_final = mat4.create();
-	if(m === undefined) m = mat4.create();
-	mat4.multiply(m_final, m, this.matrix_local);
-	
-	var u_color_specular = gl.getUniformLocation(glProgram, "uColorSpecular");
-	gl.uniform3fv(u_color_specular, this.color_specular);
-	
-	var u_ka = gl.getUniformLocation(glProgram, "uKa");
-	gl.uniform1f(u_ka, this.ka);
-	
-	var u_kd = gl.getUniformLocation(glProgram, "uKd");
-	gl.uniform1f(u_kd, this.kd);
-	
-	var u_ks = gl.getUniformLocation(glProgram, "uKs");
-	gl.uniform1f(u_ks, this.ks);
-	
-	var u_shininess = gl.getUniformLocation(glProgram, "uShininess");
-	gl.uniform1f(u_shininess, this.shininess);
-	
-	var u_use_lights = gl.getUniformLocation(glProgram, "uUseLights");
-	gl.uniform1i(u_use_lights, this.use_lights);
-	
-	var u_has_texture = gl.getUniformLocation(glProgram, "uHasTexture");
-	gl.uniform1i(u_has_texture, this.has_texture);*/
 	
 	var textureCoordAttribute = gl.getAttribLocation(glProgram, "aTextureCoord");
 	gl.enableVertexAttribArray(textureCoordAttribute);
@@ -344,28 +320,25 @@ TexturedMesh.prototype.render = function(m){
 	gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(gl.getUniformLocation(glProgram, "uSampler"), 0);
+	gl.uniform1i(glProgram.uSampler, 0);
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	
-	var u_use_normals = gl.getUniformLocation(glProgram, "uUseNormalMap");
 	if(this.texture_normals != null){
-		gl.uniform1i(u_use_normals, true);
+		gl.uniform1i(glProgram.uUseNormalMap, true);
 		
 		gl.activeTexture(gl.TEXTURE1);
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uNormalSampler"), 1);
+		gl.uniform1i(glProgram.uNormalSampler, 1);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture_normals);
 	}
 	
-	var u_use_height = gl.getUniformLocation(glProgram, "uUseHeightMap");
 	if(this.texture_displacement != null){
-		gl.uniform1i(u_use_height, true);
+		gl.uniform1i(glProgram.uUseHeightMap, true);
 		
 		gl.activeTexture(gl.TEXTURE3);
-		gl.uniform1i(gl.getUniformLocation(glProgram, "uHeightSampler"), 1);
+		gl.uniform1i(glProgram.uHeightSampler, 1);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture_displacement);
 	}
-	//Conjunto.prototype.render.call(this);
-	//this.geometry.drawVertexGrid(m_final);
+
 	Mesh.prototype.render.call(this, m);
 	gl.disableVertexAttribArray(textureCoordAttribute);
 	gl.activeTexture(gl.TEXTURE0);
@@ -373,11 +346,11 @@ TexturedMesh.prototype.render = function(m){
 	if(this.texture_normals != null){
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, null);
-		gl.uniform1i(u_use_normals, false);
+		gl.uniform1i(glProgram.uUseNormalMap, false);
 	}
 	if(this.texture_displacement != null){
 		gl.activeTexture(gl.TEXTURE3);
 		gl.bindTexture(gl.TEXTURE_2D, null);
-		gl.uniform1i(u_use_height, false);
+		gl.uniform1i(glProgram.uUseHeightMap, false);
 	}
 };
